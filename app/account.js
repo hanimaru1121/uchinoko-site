@@ -62,8 +62,10 @@ const api = {
   async download(id, onProgress) {
     if (!UUID.test(id)) throw new Error("bad id");
     const b = await call("bundle", { pet_id: id });
-    // desktop/（Mac のデスクトップペット用の背景を消した動画）はブラウザでは使わないので落とさない
-    const files = (b.manifest.files || []).filter((f) => !f.path.startsWith("desktop/"));
+    // desktop/（Mac のデスクトップペット用の背景を消した動画）はブラウザでは使わないので落とさない。
+    // 動画は、このブラウザで使う形式（.mov・.webm・.mp4 のどれか。index.html の uchinokoClipExt）だけを落とす
+    const ext = window.uchinokoClipExt ? window.uchinokoClipExt(b.manifest) : ".mp4";
+    const files = (b.manifest.files || []).filter((f) => !f.path.startsWith("desktop/") && !(f.path.startsWith("clips/") && !f.path.endsWith(ext)));
     if (!files.every((f) => SAFE_PATH.test(f.path) && b.urls[f.path])) throw new Error("bad manifest");
     const total = files.reduce((s, f) => s + f.bytes, 0);
     let done = 0;
@@ -96,7 +98,8 @@ const api = {
     const pet = await r.json();
     pet.base = "";
     pet.fromAccount = true;
-    pet.clipBlob = async (name) => { const m = await c.match(keyOf(id, s.version, `clips/${name}.mp4`)); if (!m) throw 0; return m.blob(); };
+    const ext = window.uchinokoClipExt ? window.uchinokoClipExt(pet) : ".mp4";
+    pet.clipBlob = async (name) => { const m = await c.match(keyOf(id, s.version, `clips/${name}${ext}`)); if (!m) throw 0; return m.blob(); };
     pet.iconBlob = async () => { const m = await c.match(keyOf(id, s.version, pet.icon || "icon-180.png")); if (!m) throw 0; return m.blob(); };
     return pet;
   },

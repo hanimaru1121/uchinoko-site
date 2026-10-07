@@ -130,7 +130,31 @@ body.petmode .hani video{z-index:1}body.petmode .hani video.top{z-index:2}
    動画の縁をぼかす必要が無く、影も動画に焼き込んである。切り替えはふわっと重ねず、次の最初のコマが出た瞬間に入れ替える */
 .room{position:absolute;inset:0;background:#d8d4cc center/cover no-repeat;display:none}
 body.alpha .room{display:block}
-body.alpha .hani{-webkit-mask-image:none;mask-image:none;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 13svh);transform:translateX(-50%)}
+body.alpha .hani{-webkit-mask-image:none;mask-image:none;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + var(--dog-b,13svh));
+  left:calc(50% + var(--dog-x,0px));transform:translateX(-50%) scale(var(--dog-s,1));transform-origin:50% 100%}
+/* 部屋の写真に合わせて、うちの子の位置と大きさを指で変える（写真ごとに床の高さが違うので）。背景ごとに覚える */
+.adjust{position:fixed;z-index:8;left:0;right:0;bottom:0;padding:14px 16px calc(env(safe-area-inset-bottom,0px) + 14px);display:none;
+  flex-direction:column;gap:10px;align-items:center;background:var(--bar);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:var(--ink);font-size:14px}
+body.adjusting .adjust{display:flex}
+body.adjusting .dock,body.adjusting .status{visibility:hidden}
+body.adjusting .stage{touch-action:none}
+body.adjusting .hani{outline:2px dashed rgba(255,255,255,.9);outline-offset:-2px;border-radius:12px}
+.adjust .btns{display:flex;gap:10px}
+.adjust button{border:0;border-radius:999px;padding:10px 18px;font-family:var(--display);font-weight:700;font-size:15px;background:transparent;color:var(--ink);border:1px solid var(--bar-line)}
+.adjust button.ok{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+/* ブラウザ版の背景選び（アプリは本体の画面で選ぶ） */
+.roompick{position:fixed;z-index:9;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.25)}
+.roompick.open{display:flex}
+.roompick .sheet{width:min(560px,100%);max-height:86svh;overflow:auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px);border-radius:18px 18px 0 0;
+  background:var(--bar);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);color:var(--ink)}
+.roompick h2{margin:0 0 10px;font-size:16px}
+.roompick .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.roompick .tile{display:flex;flex-direction:column;gap:4px;align-items:center;border:0;background:transparent;color:var(--ink);font-family:var(--display);font-size:12px;cursor:pointer;padding:0}
+.roompick .tile img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:10px;border:3px solid transparent}
+.roompick .tile.on img{border-color:var(--accent)}
+.roompick .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.roompick .acts button,.roompick .acts label{border:1px solid var(--bar-line);border-radius:999px;padding:9px 14px;background:transparent;color:var(--ink);font-family:var(--display);font-weight:700;font-size:14px;cursor:pointer}
+.roompick small{display:block;margin-top:10px;color:var(--sub);font-size:12px}
 body.alpha .hani video{transition:none}
 body.alpha.petmode .room{display:none}
 body.alpha.petmode .hani{top:50%;bottom:auto;transform:translate(-50%,-50%)}
@@ -169,6 +193,22 @@ body.petmode .stage{cursor:grab}
   <button class="open" id="bDeskMenu" aria-expanded="false" aria-controls="deskList" aria-label="メニュー">≡</button>
 </div>
 <div class="loading" id="loading" hidden>呼んでいます…</div>
+<div class="roompick" id="roompick" role="dialog" aria-label="背景を選ぶ">
+  <div class="sheet">
+    <h2>背景</h2>
+    <div class="grid" id="roomGrid"></div>
+    <div class="acts">
+      <label>写真から選ぶ<input type="file" id="roomFile" accept="image/*" hidden></label>
+      <button type="button" id="roomAdjust">位置と大きさを合わせる</button>
+      <button type="button" id="roomClose">閉じる</button>
+    </div>
+    <small>自分の写真は、このブラウザの中だけに保存されます。</small>
+  </div>
+</div>
+<div class="adjust" id="adjust" role="dialog" aria-label="うちの子の位置を合わせる">
+  <div>うちの子を指で動かして、2本の指で大きさを合わせてください</div>
+  <div class="btns"><button type="button" id="adjReset">元に戻す</button><button type="button" class="ok" id="adjDone">できた</button></div>
+</div>
 
 <section class="shelf" id="shelf" hidden>
   <div class="in">
@@ -397,8 +437,84 @@ let ALPHA=false;
 const canAlpha=()=>{const v=document.createElement("video"),ua=navigator.userAgent;
   /* アプリの中（WKWebView）は名乗りに Safari が無いので、WebKit で Chrome 系でないことで見分ける */
   return !!v.canPlayType('video/quicktime; codecs="hvc1"')||/AppleWebKit/.test(ua)&&!/Chrome|Chromium|Edg|Android/.test(ua);};
-/* 部屋の写真（段3で選べるようにする。いまは同梱の1枚） */
-const ROOM_DEFAULT="rooms/room.jpg";
+/* 透明の動画の形式: Safari・iPhone・Mac は .mov（HEVC）、Chrome・Firefox は .webm（VP9。その子に .webm があるとき）、どちらも無理なら背景付きの .mp4。
+   account.js（受け取り）も同じ決め方で、使う形式の動画だけを落とす */
+const webmAlpha=()=>!!document.createElement("video").canPlayType('video/webm; codecs="vp9"');
+window.uchinokoClipExt=pet=>pet&&pet.clipFormat==="alpha"?(canAlpha()?".mov":pet.alphaWebm&&webmAlpha()?".webm":".mp4"):".mp4";
+let EXT=".mp4";
+const inApp=!!(window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.uchinoko);
+/* 部屋の写真。アプリは選ばれた写真を __UCHINOKO_ROOM__（{key, src}）で渡す。自分の写真は端末の中だけにあり、データとして渡される。
+   key ごとに、うちの子の位置と大きさ（x: 左右のずれ px・b: 床からの高さ svh・s: 大きさ）を覚える */
+const ROOM_DEFAULT={key:"room",src:"rooms/room.jpg"};
+const PLACE="uchinoko.place.";
+let room=window.__UCHINOKO_ROOM__||ROOM_DEFAULT, place={x:0,b:13,s:1};
+function applyPlace(){const r=document.documentElement.style;r.setProperty("--dog-x",place.x+"px");r.setProperty("--dog-b",place.b+"svh");r.setProperty("--dog-s",place.s);}
+function setRoom(r){
+  room=r&&r.src?r:ROOM_DEFAULT;
+  $("room").style.backgroundImage=`url("${room.src}")`;
+  place=Object.assign({x:0,b:13,s:1},ls.get(PLACE+room.key,{}));applyPlace();
+}
+/* 位置合わせ: 1本の指で動かす、2本の指で大きさ。触っている間は、なでる・呼ぶにしない */
+let adjusting=false;
+function adjustRoom(){
+  if(!ALPHA||petMode)return;
+  adjusting=true;document.body.classList.add("adjusting");
+  $("adjReset").onclick=()=>{place={x:0,b:13,s:1};applyPlace();};
+  $("adjDone").onclick=()=>{adjusting=false;document.body.classList.remove("adjusting");ls.set(PLACE+room.key,place);};
+}
+/* ブラウザ版の背景: 選んだものは localStorage に、自分の写真は IndexedDB に（このブラウザの中だけ。サーバーには送らない） */
+const ROOMS=[["room","リビング"],["garden","庭"],["night","寝室"],["washitsu","和室"],["engawa","縁側"],["winter","冬の窓辺"]];
+const ROOMSEL="uchinoko.room";
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open("uchinoko-rooms",1);r.onupgradeneeded=()=>r.result.createObjectStore("photos");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function idbGet(k){const d=await idb();return new Promise(res=>{const t=d.transaction("photos").objectStore("photos").get(k);t.onsuccess=()=>res(t.result||null);t.onerror=()=>res(null);});}
+async function idbPut(k,v){const d=await idb();return new Promise((res,rej)=>{const t=d.transaction("photos","readwrite");t.objectStore("photos").put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});}
+async function webRoom(){
+  const sel=ls.get(ROOMSEL,{id:"room"});
+  if(sel.id==="custom"){try{const v=await idbGet("custom");if(v&&v.blob)return {key:"custom-"+v.at,src:URL.createObjectURL(v.blob)};}catch(_){}}
+  const id=ROOMS.some(r=>r[0]===sel.id)?sel.id:"room";
+  return {key:id,src:`rooms/${id}.jpg`};
+}
+/* 写真を長い辺 2000px の JPEG に描き直して保存する（位置情報などは残らない） */
+async function saveCustomRoom(file){
+  const img=await createImageBitmap(file);
+  const k=Math.min(1,2000/Math.max(img.width,img.height)),c=document.createElement("canvas");
+  c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+  const blob=await new Promise(r=>c.toBlob(r,"image/jpeg",0.85));
+  const at=Date.now();await idbPut("custom",{blob,at});ls.set(ROOMSEL,{id:"custom"});
+  return {key:"custom-"+at,src:URL.createObjectURL(blob)};
+}
+async function openRoomPick(){
+  const pick=$("roompick"),grid=$("roomGrid"),sel=ls.get(ROOMSEL,{id:"room"});
+  const tile=(id,name,src)=>{const b=document.createElement("button");b.type="button";b.className="tile"+(sel.id===id?" on":"");
+    const im=document.createElement("img");im.alt="";im.src=src;b.append(im,document.createTextNode(name));
+    b.onclick=async()=>{ls.set(ROOMSEL,{id});setRoom(await webRoom());pick.classList.remove("open");};return b;};
+  const tiles=ROOMS.map(([id,name])=>tile(id,name,`rooms/${id}.jpg`));
+  try{const v=await idbGet("custom");if(v&&v.blob)tiles.push(tile("custom","自分の写真",URL.createObjectURL(v.blob)));}catch(_){}
+  grid.replaceChildren(...tiles);
+  $("roomFile").onchange=async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;
+    try{setRoom(await saveCustomRoom(f));pick.classList.remove("open");adjustRoom();}catch(_){alert("写真を読み込めませんでした");}};
+  $("roomAdjust").onclick=()=>{pick.classList.remove("open");adjustRoom();};
+  $("roomClose").onclick=()=>pick.classList.remove("open");
+  pick.onclick=e=>{if(e.target===pick)pick.classList.remove("open");};
+  pick.classList.add("open");
+}
+const pts=new Map();let gesture=null;
+stage.addEventListener("pointerdown",e=>{if(!adjusting)return;stage.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});gesture=null;});
+stage.addEventListener("pointermove",e=>{
+  if(!adjusting||!pts.has(e.pointerId))return;
+  const prev=pts.get(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  const vh=innerHeight/100;
+  if(pts.size===1){place.x+=e.clientX-prev.x;place.b-=(e.clientY-prev.y)/vh;}
+  else if(pts.size===2){
+    const [a,b]=[...pts.values()],d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(gesture)place.s=Math.min(2.2,Math.max(0.35,place.s*d/gesture));
+    gesture=d;
+  }
+  place.b=Math.min(80,Math.max(-10,place.b));place.x=Math.max(-innerWidth*0.6,Math.min(innerWidth*0.6,place.x));
+  applyPlace();
+});
+const lift=e=>{pts.delete(e.pointerId);gesture=null;};
+stage.addEventListener("pointerup",lift);stage.addEventListener("pointercancel",lift);
 let forceIdle="", holdUntil=0, greet=false, gen=0, front=0, pose="", moving=null, queue=[], idleCount=0, called=false, lastIdle="", resting=false, wake=null, nextLabel="";
 
 /* the moment a finger lands: a pressed look and a light tick (iPhone app), before the action runs on release */
@@ -419,7 +535,9 @@ function setupUI(){
   const callBtn=()=>mk(P.call.button,call);
   const shelfBtn=()=>mk("ほかの子",()=>{location.href=location.pathname+"?shelf=1"+(desk?"#desk":"");});
   const showShelfBtn=!params.get("pet")&&!onlyPet;
-  const more=$("more");more.replaceChildren(...poseBtns(),callBtn(),...(showShelfBtn?[shelfBtn()]:[]));
+  /* ブラウザ版は「…」の中に背景を選ぶボタン（アプリは本体の画面で選ぶ） */
+  const roomBtn=ALPHA&&!petMode&&!inApp&&!desk?[mk("背景",openRoomPick)]:[];
+  const more=$("more");more.replaceChildren(...poseBtns(),callBtn(),...roomBtn,...(showShelfBtn?[shelfBtn()]:[]));
   const bMore=iconize(mk("姿勢を頼む",()=>{more.hidden=!more.hidden;bMore.setAttribute("aria-expanded",String(!more.hidden));}),"i-dots");
   bMore.id="bMore";bMore.setAttribute("aria-expanded","false");bMore.setAttribute("aria-label","姿勢を頼む");
   const walkBtn=petMode&&P.walk?[iconize(mk("おさんぽ",()=>window.uchinoko.walk(),{walk:"1"}),"i-paw")]:[];
@@ -436,20 +554,25 @@ function clipNames(){
   return [...names];
 }
 function preload(){
-  const src=n=>P.base+"clips/"+n+(ALPHA?".mov":CLIP_EXT);
+  const src=n=>P.base+"clips/"+n+(ALPHA?EXT:CLIP_EXT);
   const names=clipNames();
   /* keep every clip in memory so switching never waits on the network; opened from disk (native apps), play straight from the files.
      A clip that fails to load is simply skipped later. */
   /* アカウントの子は、端末に保存したものから読む */
   if(P.clipBlob)return Promise.all(names.map(n=>P.clipBlob(n).then(b=>{URL_OF[n]=URL.createObjectURL(b);}).catch(()=>{})));
-  return Promise.all(names.map(n=>fetch(src(n)).then(r=>{if(!r.ok)throw 0;return r.blob();}).then(b=>{URL_OF[n]=URL.createObjectURL(b);}).catch(()=>{URL_OF[n]=src(n);})));
+  /* 背景を消した動画は全部で 20MB を超えるので、全部を待たずに始める: 最初の姿勢の待機だけ待ち、残りは裏で読む。
+     読み終わる前に使う動画は、ファイルから直接流す（URL_OF の初めの値） */
+  names.forEach(n=>{URL_OF[n]=src(n);});
+  const loads=names.map(n=>fetch(src(n)).then(r=>{if(!r.ok)throw 0;return r.blob();}).then(b=>{URL_OF[n]=URL.createObjectURL(b);}).catch(()=>{}));
+  const first=new Set((P.poses[pose]||P.poses[P.start]).idles.map(i=>i.clip));
+  return Promise.all(loads.filter((_,i)=>first.has(names[i])));
 }
 
 /* play a clip on the back layer and fade it over the front one. Always settles: on end, on error, or by a watchdog,
    and right away when interrupted (stopPlay), so the life loop can never hang on one clip. */
-let stopPlay=null, flipNext=false;
+let stopPlay=null, flipNext=false, playSeq=0;
 function play(name){
-  const next=layers[1-front], cur=layers[front];
+  const next=layers[1-front], cur=layers[front], seq=++playSeq;
   return new Promise(res=>{
     let done=false, guard=0;
     const finish=ok=>{if(done)return;done=true;clearTimeout(guard);next.onloadeddata=next.onended=next.onerror=null;stopPlay=null;res(ok);};
@@ -464,10 +587,11 @@ function play(name){
       if(ALPHA){
         /* 透明の動画は重ねると下が透けて二重に見える。次の動画を上に出し、その最初のコマが画面に出たら前を隠す。
            前の最後のコマと次の最初のコマは同じ絵にそろえてある（tools/make_alpha.sh）ので、重なる一瞬も見えない */
-        const hide=()=>{if(layers[front]!==cur){cur.classList.remove("shown");cur.pause();}};
+        /* 後の切り替えが始まっていたら触らない（2枚の <video> を交互に使うので、cur はもう次の動画を読み込み中のことがある） */
+        const hide=()=>{if(seq===playSeq&&layers[front]!==cur){cur.classList.remove("shown");cur.pause();}};
         if(next.requestVideoFrameCallback)next.requestVideoFrameCallback(()=>hide());else setTimeout(hide,50);
         setTimeout(hide,400);   // 念のため
-      }else setTimeout(()=>{cur.classList.remove("shown");cur.pause();},360);
+      }else setTimeout(()=>{if(seq===playSeq){cur.classList.remove("shown");cur.pause();}},360);
       front=1-front;
       clearTimeout(guard);guard=setTimeout(()=>finish(true),((next.duration||10)+4)*1000);  // stalled midway
     };
@@ -607,11 +731,11 @@ function doCare(id){const c=P.care.find(x=>x.id===id);if(!c)return;called=false;
 function call(){called=true;touched();tag.textContent=P.call.label;request(P.call.pose);}
 /* tapping does what the pet's own table says for the pose it is in */
 function tap(){
-  if(!P)return;
+  if(!P||adjusting)return;
   const act=P.tap[moving||pose]||P.tap["*"];
   if(act==="call")call();else doCare(act);
 }
-if(!petMode){stage.addEventListener("click",tap);stage.addEventListener("pointerdown",()=>native({type:"haptic"}));}
+if(!petMode){stage.addEventListener("click",tap);stage.addEventListener("pointerdown",()=>{if(!adjusting)native({type:"haptic"});});}
 /* the desktop pet: press and move to carry it (the Mac app moves the window); a press without moving is a tap */
 if(petMode){
   let down=null,dragging=false;
@@ -666,7 +790,7 @@ function sync(p,idle){
   queue=[];moving=null;pose=p;idleCount=0;forceIdle=idle||"";holdUntil=now()+30e3;nextLabel="";
   markButtons();showFeeling();restart();
 }
-window.uchinoko={care:id=>P&&doCare(id),sync,walkDir:d=>{if(walkAnswer)walkAnswer(d);},walkHalt,setRoam:on=>{roam=!!on;if(!roam)walkHalt();},
+window.uchinoko={room:r=>{if(ALPHA&&!petMode)setRoom(r);},adjustRoom,care:id=>P&&doCare(id),sync,walkDir:d=>{if(walkAnswer)walkAnswer(d);},walkHalt,setRoam:on=>{roam=!!on;if(!roam)walkHalt();},
   walk:()=>{if(!petMode||!P||!P.walk||walking)return;forceWalk=true;if(pose!==P.walk.from)request(P.walk.from);else restart();},pose:p=>{if(P&&P.poses[p]){touched();request(p);}},call:()=>P&&call(),
   mood:()=>P&&({lonely:lonely(),hungry:hungry(),thirsty:thirsty(),pose}),
   /* for store screenshots (debug builds only call this): stop on one frame of a clip */
@@ -680,9 +804,9 @@ window.uchinoko={care:id=>P&&doCare(id),sync,walkDir:d=>{if(walkAnswer)walkAnswe
 
 async function start(pet){
   P=pet;M=Object.assign({},MOOD_DEFAULT,P.mood||{});EDGES={};
-  ALPHA=P.clipFormat==="alpha"&&canAlpha();
+  EXT=window.uchinokoClipExt(P);ALPHA=EXT!==".mp4";
   document.body.classList.toggle("alpha",ALPHA);
-  if(ALPHA&&!petMode)$("room").style.backgroundImage=`url(${ROOM_DEFAULT})`;
+  if(ALPHA&&!petMode){if(!window.__UCHINOKO_ROOM__&&!inApp)room=await webRoom();setRoom(room);}
   P.transitions.forEach(t=>{(EDGES[t.from]=EDGES[t.from]||{})[t.to]=t.clip;});
   if(!P.poses[P.start])P.start=Object.keys(P.poses)[0];
   const handed=window.__UCHINOKO_NOW__;
