@@ -126,11 +126,21 @@ body.petmode .hani{top:50%;width:100vw;max-width:none;-webkit-mask-image:none;ma
 body.petmode .hani::before{content:"";position:absolute;left:14%;right:14%;bottom:4%;height:11%;border-radius:50%;
   background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,.28) 55%,transparent);filter:blur(4px);z-index:0}
 body.petmode .hani video{z-index:1}body.petmode .hani video.top{z-index:2}
+/* 背景を消した動画（pet.json の clipFormat "alpha"。2026-10-07〜）: 部屋の写真を敷き、その上に犬だけを重ねる。
+   動画の縁をぼかす必要が無く、影も動画に焼き込んである。切り替えはふわっと重ねず、次の最初のコマが出た瞬間に入れ替える */
+.room{position:absolute;inset:0;background:#d8d4cc center/cover no-repeat;display:none}
+body.alpha .room{display:block}
+body.alpha .hani{-webkit-mask-image:none;mask-image:none;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 13svh);transform:translateX(-50%)}
+body.alpha .hani video{transition:none}
+body.alpha.petmode .room{display:none}
+body.alpha.petmode .hani{top:50%;bottom:auto;transform:translate(-50%,-50%)}
+body.alpha.petmode .hani::before{display:none}
 body.petmode .loading{display:none}
 body.petmode .stage{cursor:grab}
 </style>
 
 <div class="stage" id="stage" tabindex="0" role="button" aria-label="なでる・呼ぶ">
+  <div class="room" id="room"></div>
   <div class="hani">
     <video id="vA" muted playsinline preload="auto"></video>
     <video id="vB" muted playsinline preload="auto"></video>
@@ -381,6 +391,14 @@ setInterval(showFeeling,5000);
 
 /* ---------- the living pet ---------- */
 let P=null, URL_OF={}, EDGES={};
+/* 背景を消した動画を使うか: その子に .mov（透明の HEVC）があり、この画面がそれを透明で再生できるとき（iPhone・Mac・Safari）。
+   Chrome などは今までの背景付きの .mp4 を使う */
+let ALPHA=false;
+const canAlpha=()=>{const v=document.createElement("video"),ua=navigator.userAgent;
+  /* アプリの中（WKWebView）は名乗りに Safari が無いので、WebKit で Chrome 系でないことで見分ける */
+  return !!v.canPlayType('video/quicktime; codecs="hvc1"')||/AppleWebKit/.test(ua)&&!/Chrome|Chromium|Edg|Android/.test(ua);};
+/* 部屋の写真（段3で選べるようにする。いまは同梱の1枚） */
+const ROOM_DEFAULT="rooms/room.jpg";
 let forceIdle="", holdUntil=0, greet=false, gen=0, front=0, pose="", moving=null, queue=[], idleCount=0, called=false, lastIdle="", resting=false, wake=null, nextLabel="";
 
 /* the moment a finger lands: a pressed look and a light tick (iPhone app), before the action runs on release */
@@ -418,7 +436,7 @@ function clipNames(){
   return [...names];
 }
 function preload(){
-  const src=n=>P.base+"clips/"+n+CLIP_EXT;
+  const src=n=>P.base+"clips/"+n+(ALPHA?".mov":CLIP_EXT);
   const names=clipNames();
   /* keep every clip in memory so switching never waits on the network; opened from disk (native apps), play straight from the files.
      A clip that fails to load is simply skipped later. */
@@ -443,7 +461,13 @@ function play(name){
     next.onloadeddata=()=>{
       next.onloadeddata=null;
       next.classList.add("top","shown"); cur.classList.remove("top");
-      setTimeout(()=>{cur.classList.remove("shown");cur.pause();},360);
+      if(ALPHA){
+        /* 透明の動画は重ねると下が透けて二重に見える。次の動画を上に出し、その最初のコマが画面に出たら前を隠す。
+           前の最後のコマと次の最初のコマは同じ絵にそろえてある（tools/make_alpha.sh）ので、重なる一瞬も見えない */
+        const hide=()=>{if(layers[front]!==cur){cur.classList.remove("shown");cur.pause();}};
+        if(next.requestVideoFrameCallback)next.requestVideoFrameCallback(()=>hide());else setTimeout(hide,50);
+        setTimeout(hide,400);   // 念のため
+      }else setTimeout(()=>{cur.classList.remove("shown");cur.pause();},360);
       front=1-front;
       clearTimeout(guard);guard=setTimeout(()=>finish(true),((next.duration||10)+4)*1000);  // stalled midway
     };
@@ -624,6 +648,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)resume();}
 const probe=document.createElement("canvas");probe.width=probe.height=1;
 const pctx=probe.getContext("2d",{willReadFrequently:true});
 function matchRoom(){
+  if(ALPHA)return;   // 部屋の写真を敷くので、壁の色に合わせない
   const v=layers[front];if(!v.videoWidth)return;
   try{pctx.drawImage(v,v.videoWidth*0.02,v.videoHeight*0.04,v.videoWidth*0.06,v.videoHeight*0.06,0,0,1,1);
     const d=pctx.getImageData(0,0,1,1).data;document.documentElement.style.setProperty("--room",`rgb(${d[0]},${d[1]},${d[2]})`);}catch(_){}
@@ -655,6 +680,9 @@ window.uchinoko={care:id=>P&&doCare(id),sync,walkDir:d=>{if(walkAnswer)walkAnswe
 
 async function start(pet){
   P=pet;M=Object.assign({},MOOD_DEFAULT,P.mood||{});EDGES={};
+  ALPHA=P.clipFormat==="alpha"&&canAlpha();
+  document.body.classList.toggle("alpha",ALPHA);
+  if(ALPHA&&!petMode)$("room").style.backgroundImage=`url(${ROOM_DEFAULT})`;
   P.transitions.forEach(t=>{(EDGES[t.from]=EDGES[t.from]||{})[t.to]=t.clip;});
   if(!P.poses[P.start])P.start=Object.keys(P.poses)[0];
   const handed=window.__UCHINOKO_NOW__;
