@@ -128,7 +128,17 @@ body.petmode .hani::before{content:"";position:absolute;left:14%;right:14%;botto
 body.petmode .hani video{z-index:1}body.petmode .hani video.top{z-index:2}
 /* 背景を消した動画（pet.json の clipFormat "alpha"。2026-10-07〜）: 部屋の写真を敷き、その上に犬だけを重ねる。
    動画の縁をぼかす必要が無く、影も動画に焼き込んである。切り替えはふわっと重ねず、次の最初のコマが出た瞬間に入れ替える */
-.room{position:absolute;inset:0;background:#d8d4cc center/cover no-repeat;display:none}
+.room{position:absolute;inset:0;background:#d8d4cc center/cover no-repeat;display:none;transition:opacity 2s ease}
+/* 時間帯（朝・昼・夕方・夜）: 用意した背景は時間帯ごとの絵に切り替え（2枚を重ねてふわっと）、自分の写真は色をかぶせる。
+   うちの子も背景の光に合わせて明るさと色味を変える（夜の部屋で犬だけ明るいと浮く） */
+.room.fade{opacity:0}
+.tint{position:absolute;inset:0;pointer-events:none;display:none;mix-blend-mode:multiply;transition:background-color 2s ease}
+body.alpha:not(.petmode) .tint.on{display:block}
+body.alpha .hani{transition:filter 2s ease}
+body.alpha.tod-morning .hani{filter:brightness(1.02) saturate(.95) sepia(.06)}
+body.alpha.tod-evening .hani{filter:brightness(.94) saturate(1.08) sepia(.2)}
+body.alpha.tod-night .hani{filter:brightness(.82) saturate(.88) sepia(.12)}
+body.alpha.petmode .hani{filter:none}
 body.alpha .room{display:block}
 body.alpha .hani{-webkit-mask-image:none;mask-image:none;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + var(--dog-b,13svh));
   left:calc(50% + var(--dog-x,0px));transform:translateX(-50%) scale(var(--dog-s,1));transform-origin:50% 100%}
@@ -165,6 +175,8 @@ body.petmode .stage{cursor:grab}
 
 <div class="stage" id="stage" tabindex="0" role="button" aria-label="なでる・呼ぶ">
   <div class="room" id="room"></div>
+  <div class="room fade" id="roomB"></div>
+  <div class="tint" id="tint"></div>
   <div class="hani">
     <video id="vA" muted playsinline preload="auto"></video>
     <video id="vB" muted playsinline preload="auto"></video>
@@ -449,11 +461,36 @@ const ROOM_DEFAULT={key:"room",src:"rooms/room.jpg"};
 const PLACE="uchinoko.place.";
 let room=window.__UCHINOKO_ROOM__||ROOM_DEFAULT, place={x:0,b:13,s:1};
 function applyPlace(){const r=document.documentElement.style;r.setProperty("--dog-x",place.x+"px");r.setProperty("--dog-b",place.b+"svh");r.setProperty("--dog-s",place.s);}
+/* 時間帯: 朝 5〜9時・昼 9〜16時・夕方 16〜19時・夜 19〜5時（端末の時計。通信も位置情報も使わない）。?tod=night などで試せる */
+const PRESET_ROOMS=["room","garden","night","washitsu","engawa","winter"];
+const TOD_TINT={morning:"rgba(255,236,210,.18)",day:"rgba(255,255,255,0)",evening:"rgba(255,170,110,.28)",night:"rgba(60,70,120,.55)"};
+function timeOfDay(d=new Date()){
+  const f=params.get("tod");if(f&&TOD_TINT[f])return f;
+  const h=d.getHours();return h>=5&&h<9?"morning":h>=9&&h<16?"day":h>=16&&h<19?"evening":"night";
+}
+let tod="";
+function roomSrc(r,t){return PRESET_ROOMS.includes(r.key)&&t!=="day"?`rooms/${r.key}-${t}.jpg`:r.src;}
+/* 背景を描く。2枚の層を入れ替えて、前の絵からふわっと替える（first=true は最初の1回で、すぐ出す） */
+let roomFront="room";
+function paintRoom(first){
+  const t=timeOfDay();tod=t;
+  for(const k of Object.keys(TOD_TINT))document.body.classList.toggle("tod-"+k,k===t);
+  const src=roomSrc(room,t), custom=!PRESET_ROOMS.includes(room.key);
+  const tint=$("tint");tint.classList.toggle("on",custom);tint.style.backgroundColor=TOD_TINT[t];
+  const cur=$(roomFront), nxt=$(roomFront==="room"?"roomB":"room");
+  if(!cur.style.backgroundImage)first=true;   // まだ何も描いていない（開いた直後）: ふわっとさせず、すぐ出す
+  if(first){cur.dataset.src=src;cur.style.backgroundImage=`url("${src}")`;cur.classList.remove("fade");nxt.classList.add("fade");return;}
+  if(cur.dataset.src===src)return;
+  const img=new Image();img.onload=()=>{nxt.style.backgroundImage=`url("${src}")`;nxt.dataset.src=src;nxt.classList.remove("fade");cur.classList.add("fade");roomFront=nxt.id;};img.src=src;
+}
 function setRoom(r){
   room=r&&r.src?r:ROOM_DEFAULT;
-  $("room").style.backgroundImage=`url("${room.src}")`;
+  const cur=$(roomFront);cur.dataset.src="";
+  paintRoom(false);
   place=Object.assign({x:0,b:13,s:1},ls.get(PLACE+room.key,{}));applyPlace();
 }
+/* 時間帯が変わったら背景と色味を替える（1分ごとに見る） */
+setInterval(()=>{if(ALPHA&&!petMode&&timeOfDay()!==tod)paintRoom(false);},60e3);
 /* 位置合わせ: 1本の指で動かす、2本の指で大きさ。触っている間は、なでる・呼ぶにしない */
 let adjusting=false;
 function adjustRoom(){
