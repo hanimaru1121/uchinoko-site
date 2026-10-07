@@ -1,0 +1,230 @@
+{
+  "format": 1,
+  "id": "hani-nd9tpndw",
+  "name": "ハニ",
+  "shelf": "private",
+  "icon": "icon-180.png",
+  "start": "stand",
+  "movingLabel": "よいしょ",
+  "holdChance": 0.4,
+  "poses": {
+    "stand": {
+      "button": "立つ",
+      "label": "のんびり",
+      "idles": [
+        {
+          "clip": "idle_stand",
+          "weight": 55
+        },
+        {
+          "clip": "idle_stand_shake",
+          "label": "ぶるぶる",
+          "weight": 45
+        }
+      ],
+      "next": {
+        "stay": 55,
+        "sit": 27,
+        "lie": 18
+      }
+    },
+    "sit": {
+      "button": "おすわり",
+      "label": "おすわり",
+      "idles": [
+        {
+          "clip": "idle_sit",
+          "weight": 55
+        },
+        {
+          "clip": "idle_sit_groom",
+          "label": "くんくん",
+          "weight": 45
+        }
+      ],
+      "next": {
+        "stay": 45,
+        "stand": 20,
+        "lie": 35
+      }
+    },
+    "lie": {
+      "button": "ふせ",
+      "label": "ふせ",
+      "idles": [
+        {
+          "clip": "idle_lie",
+          "weight": 55
+        },
+        {
+          "clip": "idle_lie_sigh",
+          "label": "ふう",
+          "weight": 45
+        }
+      ],
+      "next": {
+        "stay": 40,
+        "sleep": 25,
+        "sit": 20,
+        "stand": 15
+      },
+      "nightNext": {
+        "stay": 40,
+        "sleep": 45,
+        "sit": 15
+      }
+    },
+    "sleep": {
+      "button": "ねんね",
+      "label": "ねんね",
+      "nightLabel": "夜なのでねんね",
+      "arriveLabel": "うとうと",
+      "idles": [
+        {
+          "clip": "idle_sleep",
+          "weight": 55
+        },
+        {
+          "clip": "idle_sleep_dream",
+          "label": "ゆめをみてる",
+          "weight": 45
+        }
+      ],
+      "stayIdles": [
+        4,
+        8
+      ],
+      "next": {
+        "lie": 100
+      },
+      "noHold": true
+    }
+  },
+  "transitions": [
+    {
+      "from": "stand",
+      "to": "sit",
+      "clip": "stand_sit"
+    },
+    {
+      "from": "sit",
+      "to": "stand",
+      "clip": "sit_stand"
+    },
+    {
+      "from": "sit",
+      "to": "lie",
+      "clip": "sit_lie"
+    },
+    {
+      "from": "lie",
+      "to": "sit",
+      "clip": "lie_sit"
+    },
+    {
+      "from": "stand",
+      "to": "lie",
+      "clip": "stand_lie"
+    },
+    {
+      "from": "lie",
+      "to": "stand",
+      "clip": "lie_stand"
+    },
+    {
+      "from": "lie",
+      "to": "sleep",
+      "clip": "lie_sleep"
+    },
+    {
+      "from": "sleep",
+      "to": "lie",
+      "clip": "sleep_lie"
+    }
+  ],
+  "call": {
+    "button": "呼ぶ",
+    "pose": "stand",
+    "label": "なあに？"
+  },
+  "care": [
+    {
+      "id": "pet",
+      "button": "なでる",
+      "pose": "lie",
+      "outcomes": [
+        {
+          "clip": "pet_calm",
+          "label": "うっとり",
+          "weight": 70
+        },
+        {
+          "clip": "pet_dodge",
+          "label": "いまはいや",
+          "weight": 30
+        }
+      ],
+      "settles": []
+    },
+    {
+      "id": "treat",
+      "button": "おやつ",
+      "pose": "sit",
+      "outcomes": [
+        {
+          "clip": "treat",
+          "label": "もぐもぐ",
+          "weight": 100
+        }
+      ],
+      "settles": [
+        "treat"
+      ]
+    },
+    {
+      "id": "water",
+      "button": "お水",
+      "pose": "stand",
+      "outcomes": [
+        {
+          "clip": "water",
+          "label": "ぴちゃぴちゃ",
+          "weight": 100
+        }
+      ],
+      "settles": [
+        "water"
+      ]
+    }
+  ],
+  "tap": {
+    "lie": "pet",
+    "*": "call"
+  },
+  "notes": "頭をなでようとすると時々避ける（3割）。癖：ぶるぶる・おなかの下を嗅ぐ・ため息・夢でぴくぴく。目は白内障になる前の澄んだ黒。 尻尾はとても短い（断尾。お尻に小さな丸い毛のかたまりがちょこんと付いているだけ。人の親指より短い）。長い尻尾・巻いた尻尾にしない。 歩き方は15歳を超えた老犬の、ゆっくり・小股・少しぎこちない、のんびりした歩き（見た目は若い頃のまま）。",
+  "mood": {
+    "lonelyMinutes": 30,
+    "hungryHours": 6,
+    "thirstyHours": 3,
+    "lonelyLabel": "かまって？",
+    "hungryLabel": "おなかすいた…",
+    "thirstyLabel": "のどかわいた…",
+    "greetLabel": "おかえり",
+    "greetAfterHours": 3
+  },
+  "walk": {
+    "from": "stand",
+    "start": "stand_to_walk",
+    "loop": "walk",
+    "stop": "walk_to_stand",
+    "label": "おさんぽ",
+    "chance": 0.35,
+    "loops": [
+      2,
+      5
+    ],
+    "speed": 0.13,
+    "spin": "spin",
+    "spinLabel": "くるくる"
+  }
+}

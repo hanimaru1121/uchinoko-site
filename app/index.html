@@ -1,0 +1,686 @@
+<!doctype html>
+<html lang="ja">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>うちの子ライブ</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ebe3d8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="うちの子">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+/* layout: the pet fills the screen like a room it lives in; the care buttons sit low in a soft bar, poses tuck behind a "more" toggle.
+   One fixed look on purpose: the room is the same warm studio wall as the videos, in light or dark mode. #desk = the small always-on-top window on a Mac. */
+:root{
+  --room:#ebe3d8;            /* updated live from the video's own wall colour */
+  --bar:rgba(255,252,247,.72); --bar-line:rgba(120,96,72,.16);
+  --ink:#2b2520; --sub:#6f6257; --accent:#c8743d; --accent-ink:#fff;
+  --display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;touch-action:manipulation}  /* no double-tap zoom, no tap delay */
+body{margin:0;background:var(--room);color:var(--ink);font-family:var(--display);overflow:hidden;transition:background-color 1.2s linear;user-select:none;-webkit-user-select:none}
+.stage{position:fixed;inset:0;cursor:pointer;outline:none}
+.hani{position:absolute;left:50%;top:54%;width:min(100vw,74svh);aspect-ratio:1/1;max-width:100%;transform:translate(-50%,-50%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 86%,transparent 100%),linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%);
+  -webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 86%,transparent 100%),linear-gradient(to right,transparent 0,#000 9%,#000 91%,transparent 100%);mask-composite:intersect}
+@media (max-aspect-ratio: 3/4){ .hani{ -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 86%,transparent 100%); mask-image:linear-gradient(to bottom,transparent 0,#000 16%,#000 86%,transparent 100%) } }
+.hani video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .32s ease-in-out;pointer-events:none}
+.hani video.top{z-index:2}
+.hani video.shown{opacity:1}
+.hani video.flip{transform:scaleX(-1)}  /* walking the other way: the same clips, mirrored */
+/* status, top left and small: a round medal in the colour of the feeling (like a tag on a collar), then hearts and what the pet is doing */
+.status{position:fixed;z-index:5;top:calc(env(safe-area-inset-top,0px) + 12px);left:14px;display:flex;align-items:center;gap:6px;pointer-events:none}
+.medal{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;border:2px solid #fff;background:var(--feel);color:#fff;transition:background-color .6s}
+.medal svg{width:15px;height:15px}
+.pill{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 8px;border-radius:999px;background:var(--bar);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.hearts{display:flex;gap:2px;color:#e8879e}.hearts svg{width:10px;height:10px}.hearts svg.off{color:rgba(43,37,32,.16)}
+.tag{color:var(--ink);font-size:12px;font-weight:700;white-space:nowrap}
+.tag:empty{display:none}
+:root{--feel:#e8879e}
+.loading{position:fixed;z-index:6;inset:0;display:grid;place-items:center;color:var(--sub);font-size:15px;background:var(--room)}
+.loading[hidden]{display:none}
+/* care: a small capsule of round icon buttons at the bottom centre; poses tuck into a small row above it */
+.dock{position:fixed;z-index:5;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px}
+.row{display:flex;gap:5px;padding:5px;background:var(--bar);border-radius:999px;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.row button{border:0;cursor:pointer;color:var(--ink);font-family:var(--display);font-weight:700;transition:background-color .12s,transform .12s;touch-action:manipulation}
+#careRow button{width:38px;height:38px;border-radius:50%;padding:0;display:grid;place-items:center;background:transparent}
+#careRow button svg{width:18px;height:18px}
+#careRow button[data-care="pet"]{background:#fbe3ea;color:#8a2f47}
+#careRow button[data-care="treat"]{background:#f8e7cf;color:#6b3a14}
+#careRow button[data-care="water"]{background:#dfeefb;color:#1d4c78}
+#careRow button[data-walk]{background:#e3f1e6;color:#2f5d3a}
+.row button:active,.row button.press{transform:scale(.88);filter:brightness(.94)}
+.row button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.row.more button{padding:7px 11px;border-radius:999px;background:transparent;font-size:12px;white-space:nowrap}
+.row.more button.on{background:var(--accent);color:var(--accent-ink)}
+.row.more[hidden]{display:none}
+#bMore[aria-expanded="true"]{background:rgba(43,37,32,.08)}
+@media (prefers-reduced-motion: reduce){ .hani video{transition:none} body{transition:none} }
+
+/* the Mac desk window: only Hani, controls appear on hover */
+body.desk .hani{top:50%;width:100vw;max-width:none;-webkit-mask-image:radial-gradient(closest-side,#000 78%,transparent 100%);mask-image:radial-gradient(closest-side,#000 78%,transparent 100%)}
+/* Mac (desk window and desktop pet): the same badge and icon buttons as the iPhone, shown only while the pointer is over the pet */
+body.desk .status,body.desk .dock,body.petmode .status,body.petmode .dock{opacity:0;transition:opacity .25s;pointer-events:none}
+body.desk:hover .status,body.desk:hover .dock,body.petmode:hover .status,body.petmode:hover .dock{opacity:1}
+body.desk:hover .dock,body.petmode:hover .dock{pointer-events:auto}
+/* the desktop pet has no buttons at all: everything (care, poses, walk, choosing a pet) is in the right-click menu */
+body.petmode .dock{display:none!important}
+body.desk .status{top:10px;left:10px}
+body.desk .dock{bottom:10px}
+body.desk .row.more{gap:0;padding:3px}
+body.desk .row.more button{padding:5px 7px;font-size:11px}
+/* the desktop pet is small and has no room: smaller pieces, care only (poses live in the menu bar) */
+body.petmode .status{top:4px;left:4px;gap:4px}
+body.petmode .medal{width:22px;height:22px;border-width:1.5px}body.petmode .medal svg{width:11px;height:11px}
+body.petmode .pill{padding:2px 6px}
+body.petmode .tag{display:none}
+body.petmode .dock{bottom:4px}
+body.petmode .row{gap:3px;padding:3px}
+body.petmode #careRow button{width:28px;height:28px}
+body.petmode #careRow button svg{width:14px;height:14px}
+body.petmode #bMore,body.petmode .row.more{display:none}
+.deskmenu{display:none}
+.deskmenu .open{width:30px;height:30px;border-radius:50%;border:1px solid var(--bar-line);background:var(--bar);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  color:var(--ink);font-size:14px;line-height:1;cursor:pointer;opacity:0;transition:opacity .2s}
+body.desk:hover .deskmenu .open,.deskmenu .open[aria-expanded="true"]{opacity:1}
+.deskmenu .list{position:absolute;right:0;bottom:36px;display:flex;flex-direction:column;min-width:112px;padding:4px;border-radius:12px;background:var(--bar);border:1px solid var(--bar-line);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);box-shadow:0 6px 18px rgba(60,40,20,.18)}
+.deskmenu .list[hidden]{display:none}
+.deskmenu .list button{border:0;background:transparent;color:var(--ink);font-family:var(--display);font-weight:700;font-size:12px;text-align:left;padding:6px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.deskmenu .list button:hover{background:rgba(200,116,61,.16)}
+.deskmenu .list hr{border:0;border-top:1px solid var(--bar-line);margin:3px 6px}
+
+/* the shelf: choose which pet lives here (public samples, or a private one by its code) */
+.shelf{position:fixed;z-index:7;inset:0;overflow:auto;background:var(--room);padding:calc(env(safe-area-inset-top,0px) + 28px) 20px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.shelf[hidden]{display:none}
+.shelf .in{max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.shelf h1{font-size:24px;margin:0}
+.shelf h2{font-size:15px;margin:0 0 10px;color:var(--sub)}
+.shelf p{margin:0;color:var(--sub);font-size:14px;line-height:1.6}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:18px;border:1px solid var(--bar-line);background:var(--bar);font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink);cursor:pointer}
+.card img{width:88px;height:88px;border-radius:24px;object-fit:cover}
+.code{display:flex;gap:8px}
+.code input{flex:1;min-width:0;font:inherit;font-size:16px;padding:12px 14px;border-radius:14px;border:1px solid var(--bar-line);background:#fffdf9;color:var(--ink)}
+.code button{border:0;border-radius:14px;padding:0 18px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:15px;cursor:pointer}
+.code input:focus-visible,.code button:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.err{color:#a6402a;font-size:14px;min-height:1.4em}
+.shelf [hidden]{display:none!important}
+.card small{font-family:var(--body,inherit);font-weight:400;font-size:12px;color:var(--sub)}
+.card:disabled{opacity:.7;cursor:progress}
+.acct-btns{display:flex;gap:8px;flex-wrap:wrap}
+.acct-btns button{border:1px solid var(--bar-line);border-radius:14px;padding:12px 18px;background:var(--bar);color:var(--ink);font-family:var(--display);font-weight:700;font-size:15px;cursor:pointer}
+
+/* #pet = the desktop pet on a Mac: no room, no frame, just the animal on the desktop (clips have transparent backgrounds) */
+html.petmode,body.petmode{background:transparent!important}
+body.petmode .hani{top:50%;width:100vw;max-width:none;-webkit-mask-image:none;mask-image:none}
+/* a soft shadow under the feet, so the cut-out pet stands on the desktop instead of floating (the video's own floor shadow is cut away) */
+body.petmode .hani::before{content:"";position:absolute;left:14%;right:14%;bottom:4%;height:11%;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.55),rgba(0,0,0,.28) 55%,transparent);filter:blur(4px);z-index:0}
+body.petmode .hani video{z-index:1}body.petmode .hani video.top{z-index:2}
+body.petmode .loading{display:none}
+body.petmode .stage{cursor:grab}
+</style>
+
+<div class="stage" id="stage" tabindex="0" role="button" aria-label="なでる・呼ぶ">
+  <div class="hani">
+    <video id="vA" muted playsinline preload="auto"></video>
+    <video id="vB" muted playsinline preload="auto"></video>
+  </div>
+</div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- icons: also cut out as the widget's images by the iPhone build (prototypes/ios/build.sh), so the app and the widget look the same -->
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.6.7-1.4 2.2-2.6 4.3-2.6 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><g fill="currentColor"><ellipse cx="6" cy="10" rx="2.2" ry="2.8"/><ellipse cx="10" cy="6.2" rx="2.2" ry="2.9"/><ellipse cx="14.5" cy="6.2" rx="2.2" ry="2.9"/><ellipse cx="18.4" cy="10" rx="2.2" ry="2.8"/><path d="M12.2 11.5c-3 0-6 3.6-6 6.2 0 1.9 1.6 2.6 3 2.3 1.3-.3 2-.8 3-.8s1.7.5 3 .8c1.4.3 3-.4 3-2.3 0-2.6-3-6.2-6-6.2z"/></g></symbol>
+  <symbol id="i-bone" viewBox="0 0 24 24"><g fill="currentColor" transform="rotate(-35 12 12)"><rect x="5" y="9.6" width="14" height="4.8" rx="1.5"/><circle cx="5" cy="9.6" r="2.7"/><circle cx="5" cy="14.4" r="2.7"/><circle cx="19" cy="9.6" r="2.7"/><circle cx="19" cy="14.4" r="2.7"/></g></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5S5 10.3 5 14.8A7 7 0 0 0 19 14.8C19 10.3 12 2.5 12 2.5z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path fill="currentColor" d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24"><path fill="currentColor" d="M8 11V5.5a1.5 1.5 0 0 1 3 0V10h.5V3.8a1.5 1.5 0 0 1 3 0V10h.5V5a1.5 1.5 0 0 1 3 0v8.5c0 4.4-2.8 7.5-6.8 7.5-2.6 0-4.2-1.2-5.7-3.4L3 13.3a1.5 1.5 0 0 1 2.4-1.8L8 14.2z"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></g></symbol>
+</svg>
+<div class="status" id="status">
+  <span class="medal" id="medal" role="img" aria-live="polite"><svg><use href="#i-heart"/></svg></span>
+  <span class="pill"><span class="hearts" id="hearts"></span><span class="tag" id="tag"></span></span>
+</div>
+<div class="dock">
+  <div class="row more" id="more" hidden></div>
+  <div class="row" id="careRow"></div>
+</div>
+<div class="deskmenu" id="deskmenu">
+  <div class="list" id="deskList" hidden></div>
+  <button class="open" id="bDeskMenu" aria-expanded="false" aria-controls="deskList" aria-label="メニュー">≡</button>
+</div>
+<div class="loading" id="loading" hidden>呼んでいます…</div>
+
+<section class="shelf" id="shelf" hidden>
+  <div class="in">
+    <div>
+      <h1>うちの子ライブ</h1>
+      <p>画面の中で暮らす子を迎えます。</p>
+    </div>
+    <div id="accountBox" hidden>
+      <h2>アカウントの子</h2>
+      <p id="acctWho"></p>
+      <div class="cards" id="acctCards"></div>
+      <p id="acctNone" hidden>まだいません。</p>
+      <form class="code" id="devForm" autocomplete="off" hidden>
+        <input id="devEmail" aria-label="メール（試験用）" placeholder="メール（試験用）" autocapitalize="off" spellcheck="false">
+        <input id="devPass" aria-label="パスワード（試験用）" placeholder="パスワード" type="password">
+        <button type="submit">ログイン</button>
+      </form>
+      <div class="acct-btns" id="acctBtns"></div>
+      <div class="err" id="acctErr" role="status"></div>
+    </div>
+    <div id="mineBox" hidden>
+      <h2>うちの子</h2>
+      <div class="cards" id="mine"></div>
+    </div>
+    <div>
+      <h2>みんなの棚</h2>
+      <div class="cards" id="cards"></div>
+      <p id="noCards" hidden>準備中です。</p>
+    </div>
+    <div>
+      <h2>コードで迎える</h2>
+      <p>迎え入れコードをもらった人は、ここに入れてください。</p>
+      <form class="code" id="codeForm" autocomplete="off">
+        <input id="codeInput" aria-label="迎え入れコード" placeholder="迎え入れコード" autocapitalize="off" spellcheck="false">
+        <button type="submit">迎える</button>
+      </form>
+      <div class="err" id="codeErr" role="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- アカウントの子（account.js）。無い版・開けない版（iPhone のファイル読み込み・公開のサンプル）では onerror で「無し」にする -->
+<script type="module" src="account.js" data-account onerror="window.uchinokoAccount=null;dispatchEvent(new Event('uchinoko-account'))"></script>
+<script>
+(function(){
+/* ---------- which pet lives here ----------
+   A pet is a folder pets/<id>/ with pet.json + clips/. Public pets are listed in pets/catalog.json;
+   private ones are not listed and are opened by their code (the folder id). Every pet adopted here is remembered,
+   so going back to the shelf never loses a code. */
+const params=new URLSearchParams(location.search);
+const desk=location.hash==="#desk";
+const petMode=location.hash==="#pet";
+if(desk)document.body.classList.add("desk");
+if(petMode){document.body.classList.add("petmode");document.documentElement.classList.add("petmode");}
+/* the desktop pet uses transparent-background clips (.mov, HEVC with alpha) */
+const CLIP_EXT=params.get("fmt")==="mov"?".mov":".mp4";
+/* talk to the native app that hosts the page (Mac desktop pet / iPhone); does nothing in a browser */
+const native=msg=>{try{window.webkit.messageHandlers.uchinoko.postMessage(msg);}catch(_){}};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(_){return d}},set(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,JSON.stringify(v));}catch(_){}}};
+const CUR="uchinoko.current", ADOPTED="uchinoko.adopted";
+const $=id=>document.getElementById(id);
+const stage=$("stage"),tag=$("tag"),loading=$("loading"),shelf=$("shelf");
+const layers=[$("vA"),$("vB")];
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const now=()=>Date.now();
+const isNight=()=>{const h=new Date().getHours();return h>=22||h<6;};
+const weighted=(items,w=x=>x.weight)=>{const total=items.reduce((s,x)=>s+w(x),0);let r=Math.random()*total;for(const x of items){r-=w(x);if(r<0)return x;}return items[items.length-1];};
+const validId=id=>/^[a-z0-9][a-z0-9-]{2,40}$/.test(id||"");
+
+/* アカウントで迎えた子（account.js。無い版では null）。読み込みを待ってから使う */
+const account=new Promise(r=>{
+  if(window.uchinokoAccount!==undefined)return r(window.uchinokoAccount);
+  /* ファイルから開く版（iPhone・Mac）はアカウントをアプリ側で扱う。ファイルからはモジュールを読めず、失敗の知らせも来ないので待たない */
+  if(location.protocol==="file:"||!document.querySelector("script[data-account]"))return r(null);
+  addEventListener("uchinoko-account",()=>r(window.uchinokoAccount),{once:true});setTimeout(()=>r(null),8000);
+});
+async function loadPet(id){
+  if(!validId(id))throw new Error("bad id");
+  const acct=await account;
+  const saved=acct&&await acct.cachedPet(id);
+  if(saved)return saved;
+  /* native apps open the page from disk, where fetch() cannot read files; they hand the pet over themselves */
+  const given=window.__UCHINOKO_PETS__&&window.__UCHINOKO_PETS__[id];
+  if(given)return Object.assign({base:"pets/"+id+"/"},given);  /* アカウントの子は、アプリが base（uchinoko-pet://<id>/）も渡す */
+  const r=await fetch("pets/"+id+"/pet.json",{cache:"no-cache"});
+  if(!r.ok)throw new Error("not found");
+  const pet=await r.json();pet.base="pets/"+id+"/";return pet;
+}
+function remember(pet){
+  ls.set(CUR,pet.id);
+  const list=ls.get(ADOPTED,[]).filter(x=>x.id!==pet.id);
+  list.unshift({id:pet.id,name:pet.name,icon:pet.icon||"icon-180.png",account:!!pet.fromAccount});ls.set(ADOPTED,list);
+}
+
+/* ---------- the shelf ---------- */
+function card(it){
+  const b=document.createElement("button");b.className="card";b.type="button";
+  const img=document.createElement("img");img.alt="";
+  if(it.account)account.then(a=>a&&a.cachedPet(it.id)).then(p=>p&&p.iconBlob()).then(bl=>{if(bl)img.src=URL.createObjectURL(bl);}).catch(()=>{});
+  else img.src="pets/"+it.id+"/"+(it.icon||"icon-180.png");
+  b.append(img,document.createTextNode(it.name));b.onclick=()=>adopt(it.id);return b;
+}
+/* アカウントの子: ログインしていなければログインのボタン、していれば一覧（保存済みはそのまま迎える、未保存は落としてから） */
+async function showAccount(){
+  const acct=await account;if(!acct||!$("accountBox"))return;
+  $("accountBox").hidden=false;$("acctErr").textContent="";
+  const btn=(label,fn)=>{const x=document.createElement("button");x.type="button";x.textContent=label;x.onclick=fn;return x;};
+  const who=await acct.user();
+  $("devForm").hidden=!!who||!acct.devLogin();
+  if(!who){
+    $("acctWho").textContent="お届けした子は、Apple でサインインするとここに並びます。";
+    $("acctCards").replaceChildren();$("acctNone").hidden=true;
+    $("acctBtns").replaceChildren(btn("Appleでサインイン",()=>acct.signInApple().catch(()=>{$("acctErr").textContent="サインインできませんでした。";})));
+    return;
+  }
+  $("acctWho").textContent="ログイン中: "+(who.email||"Apple ID");
+  $("acctBtns").replaceChildren(btn("ログアウト",async()=>{
+    const ids=new Set(Object.keys(acct.saved()));
+    await acct.signOut();
+    ls.set(ADOPTED,ls.get(ADOPTED,[]).filter(x=>!x.account&&!ids.has(x.id)));
+    if(ids.has(ls.get(CUR,null)))ls.set(CUR,null);
+    showShelf();
+  }));
+  let pets=[];
+  try{pets=await acct.library();}catch(_){ $("acctErr").textContent="一覧を読み込めませんでした。保存済みの子はそのまま会えます。"; }
+  const saved=acct.saved();
+  /* 取り下げられた子は account.js が消した。迎えた子の一覧からも外す */
+  const before=ls.get(ADOPTED,[]), kept=before.filter(x=>!x.account||saved[x.id]);
+  if(kept.length!==before.length){
+    ls.set(ADOPTED,kept);
+    if(before.some(x=>x.account&&!saved[x.id]&&x.id===ls.get(CUR,null)))ls.set(CUR,null);
+    $("mineBox").hidden=!kept.length;$("mine").replaceChildren(...kept.map(card));
+  }
+  $("acctNone").hidden=pets.length>0;
+  $("acctCards").replaceChildren(...pets.map(p=>{
+    const have=saved[p.id]&&saved[p.id].version===p.version;
+    const c=document.createElement("button");c.className="card";c.type="button";
+    const note=document.createElement("small");note.textContent=have?"":"受け取る（"+(p.bytes/1e6).toFixed(0)+"MB）";
+    c.append(document.createTextNode(p.name),note);
+    c.onclick=async()=>{
+      if(!have){
+        c.disabled=true;
+        try{await acct.download(p.id,(d,t)=>{note.textContent="受け取り中 "+Math.round(d/t*100)+"%";});}
+        catch(_){c.disabled=false;note.textContent="受け取れませんでした。もう一度押してください";return;}
+      }
+      adopt(p.id);
+    };
+    return c;
+  }));
+}
+async function showShelf(){
+  shelf.hidden=false;loading.hidden=true;
+  showAccount();
+  const mine=ls.get(ADOPTED,[]);
+  $("mineBox").hidden=!mine.length;$("mine").replaceChildren(...mine.map(card));
+  let list=[];
+  try{const r=await fetch("pets/catalog.json",{cache:"no-cache"});if(r.ok)list=(await r.json()).public||[];}catch(_){}
+  $("noCards").hidden=list.length>0;$("cards").replaceChildren(...list.map(card));
+}
+async function adopt(id){
+  $("codeErr").textContent="";
+  try{const pet=await loadPet(id);remember(pet);shelf.hidden=true;start(pet);}
+  catch(_){ $("codeErr").textContent="その子が見つかりませんでした。コードをもう一度確かめてください。"; }
+}
+$("codeForm").addEventListener("submit",e=>{e.preventDefault();adopt($("codeInput").value.trim().toLowerCase());});
+/* 試験用ログインの欄（棚を出さない iPhone 版などには無い） */
+if($("devForm"))$("devForm").addEventListener("submit",async e=>{e.preventDefault();
+  const a=await account;if(!a)return;
+  try{await a.signInDev($("devEmail").value.trim(),$("devPass").value);showShelf();}catch(_){ $("acctErr").textContent="ログインできませんでした。"; }});
+
+/* ---------- mood ----------
+   Three feelings that drift with time and settle with care. They only nudge what the pet chooses to do next;
+   nothing bad ever happens from being left alone (no sickness, no leaving, no blame). */
+const MOOD_DEFAULT={lonelyMinutes:30,hungryHours:6,thirstyHours:3,lonelyLabel:"かまって？",hungryLabel:"おなかすいた…",thirstyLabel:"のどかわいた…",greetLabel:"おかえり",greetAfterHours:3};
+let M=null, mood=null;
+const moodKey=()=>"uchinoko.mood."+P.id;
+function loadMood(){
+  const t=now();mood=Object.assign({touch:t,treat:t,water:t,pets:[]},ls.get(moodKey(),{}));
+  /* the iPhone app keeps the one true copy (the widget reads it); take its times, and fill any missing one with now and send it back */
+  const h=window.__UCHINOKO_NOW__;
+  if(h){let fill=false;for(const k of ["touch","treat","water"]){if(h[k]>0)mood[k]=h[k];else{mood[k]=t;fill=true;}}if(fill)saveMood();}
+}
+function saveMood(){ls.set(moodKey(),mood);native({type:"mood",touch:mood.touch,treat:mood.treat,water:mood.water,pose});showFeeling();}
+const clamp01=x=>Math.max(0,Math.min(1,x));
+const lonely=()=>clamp01((now()-mood.touch)/(M.lonelyMinutes*60e3));
+const hungry=()=>clamp01((now()-mood.treat)/(M.hungryHours*3600e3));
+const thirsty=()=>clamp01((now()-mood.water)/(M.thirstyHours*3600e3));
+function cared(id){
+  const t=now();mood.touch=t;
+  const c=P.care.find(x=>x.id===id);
+  if(c&&c.settles){for(const k of c.settles)mood[k]=t;}
+  if(id==="pet"){mood.pets=mood.pets.filter(x=>t-x<10*60e3).concat(t);}
+  saveMood();
+}
+function touched(){mood.touch=now();saveMood();}
+/* the feeling on the badge. Same order as PetState.now() (prototypes/ios/Shared/PetState.swift); change both together */
+const FEEL={happy:["i-heart","#e8879e","ごきげん"],lonely:["i-paw","#e6a23c","かまって"],hungry:["i-bone","#d08a4a","おなかすいた"],
+  thirsty:["i-drop","#6fa8dc","のどかわいた"],sleepy:["i-moon","#9a8fd6","すやすや"]};
+function feeling(){
+  if((moving||pose)==="sleep")return "sleepy";
+  if(hungry()>=1)return "hungry";
+  if(thirsty()>=1)return "thirsty";
+  if(lonely()>=1)return "lonely";
+  return "happy";
+}
+let shownFeel="";
+function showFeeling(){
+  if(!P||!mood)return;
+  const f=feeling(), n=3-[hungry()>=1,thirsty()>=1,lonely()>=1].filter(Boolean).length;
+  const key=f+n;if(key===shownFeel)return;shownFeel=key;
+  const [icon,color,label]=FEEL[f];
+  document.documentElement.style.setProperty("--feel",color);
+  $("medal").innerHTML=`<svg aria-hidden="true"><use href="#${icon}"/></svg>`;$("medal").setAttribute("aria-label",label);
+  $("hearts").innerHTML=[0,1,2].map(i=>`<svg class="${i<n?"":"off"}" aria-hidden="true"><use href="#i-heart"/></svg>`).join("");
+  $("hearts").setAttribute("aria-label","ごきげん度 "+n);
+  const sym=document.getElementById(icon);
+  native({type:"feeling",feeling:f,label,hearts:n,svg:sym?`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">${sym.innerHTML.replace(/currentColor/g,"#000")}</svg>`:""});
+}
+setInterval(showFeeling,5000);
+
+/* ---------- the living pet ---------- */
+let P=null, URL_OF={}, EDGES={};
+let forceIdle="", holdUntil=0, greet=false, gen=0, front=0, pose="", moving=null, queue=[], idleCount=0, called=false, lastIdle="", resting=false, wake=null, nextLabel="";
+
+/* the moment a finger lands: a pressed look and a light tick (iPhone app), before the action runs on release */
+function pressable(el){
+  const off=()=>el.classList.remove("press");
+  el.addEventListener("pointerdown",()=>{el.classList.add("press");native({type:"haptic"});});
+  ["pointerup","pointercancel","pointerleave"].forEach(t=>el.addEventListener(t,off));
+}
+function setupUI(){
+  document.title=P.name;
+  stage.setAttribute("aria-label",P.name+"をなでる・呼ぶ");
+  const mk=(label,fn,attrs)=>{const b=document.createElement("button");b.type="button";b.textContent=label;b.onclick=e=>{e.stopPropagation();fn();};pressable(b);if(attrs)for(const k in attrs)b.dataset[k]=attrs[k];return b;};
+  const poseBtns=()=>Object.entries(P.poses).map(([k,v])=>mk(v.button,()=>{touched();request(k);},{pose:k}));
+  const careBtns=()=>P.care.map(c=>mk(c.button,()=>doCare(c.id),{care:c.id}));
+  /* in the bottom capsule the care buttons are icons only (the label stays as the accessible name) */
+  const CARE_ICON={pet:"i-hand",treat:"i-bone",water:"i-drop"};
+  const iconize=(b,icon)=>{b.setAttribute("aria-label",b.textContent);b.innerHTML=`<svg aria-hidden="true"><use href="#${icon}"/></svg>`;return b;};
+  const callBtn=()=>mk(P.call.button,call);
+  const shelfBtn=()=>mk("ほかの子",()=>{location.href=location.pathname+"?shelf=1"+(desk?"#desk":"");});
+  const showShelfBtn=!params.get("pet")&&!onlyPet;
+  const more=$("more");more.replaceChildren(...poseBtns(),callBtn(),...(showShelfBtn?[shelfBtn()]:[]));
+  const bMore=iconize(mk("姿勢を頼む",()=>{more.hidden=!more.hidden;bMore.setAttribute("aria-expanded",String(!more.hidden));}),"i-dots");
+  bMore.id="bMore";bMore.setAttribute("aria-expanded","false");bMore.setAttribute("aria-label","姿勢を頼む");
+  const walkBtn=petMode&&P.walk?[iconize(mk("おさんぽ",()=>window.uchinoko.walk(),{walk:"1"}),"i-paw")]:[];
+  $("careRow").replaceChildren(...careBtns().map(b=>iconize(b,CARE_ICON[b.dataset.care]||"i-paw")),...walkBtn,bMore);
+  $("deskList").replaceChildren(...careBtns(),document.createElement("hr"),...poseBtns(),callBtn(),...(showShelfBtn?[document.createElement("hr"),shelfBtn()]:[]));
+}
+
+function clipNames(){
+  const names=new Set();
+  for(const v of Object.values(P.poses))v.idles.forEach(i=>names.add(i.clip));
+  P.transitions.forEach(t=>names.add(t.clip));
+  P.care.forEach(c=>c.outcomes.forEach(o=>names.add(o.clip)));
+  if(petMode&&P.walk)[P.walk.start,P.walk.loop,P.walk.stop,P.walk.spin].filter(Boolean).forEach(n=>names.add(n));  // only the desktop pet walks
+  return [...names];
+}
+function preload(){
+  const src=n=>P.base+"clips/"+n+CLIP_EXT;
+  const names=clipNames();
+  /* keep every clip in memory so switching never waits on the network; opened from disk (native apps), play straight from the files.
+     A clip that fails to load is simply skipped later. */
+  /* アカウントの子は、端末に保存したものから読む */
+  if(P.clipBlob)return Promise.all(names.map(n=>P.clipBlob(n).then(b=>{URL_OF[n]=URL.createObjectURL(b);}).catch(()=>{})));
+  return Promise.all(names.map(n=>fetch(src(n)).then(r=>{if(!r.ok)throw 0;return r.blob();}).then(b=>{URL_OF[n]=URL.createObjectURL(b);}).catch(()=>{URL_OF[n]=src(n);})));
+}
+
+/* play a clip on the back layer and fade it over the front one. Always settles: on end, on error, or by a watchdog,
+   and right away when interrupted (stopPlay), so the life loop can never hang on one clip. */
+let stopPlay=null, flipNext=false;
+function play(name){
+  const next=layers[1-front], cur=layers[front];
+  return new Promise(res=>{
+    let done=false, guard=0;
+    const finish=ok=>{if(done)return;done=true;clearTimeout(guard);next.onloadeddata=next.onended=next.onerror=null;stopPlay=null;res(ok);};
+    stopPlay=()=>{next.pause();finish(false);};
+    if(!URL_OF[name]){finish(false);return;}
+    guard=setTimeout(()=>finish(false),5000);           // never started
+    next.onerror=()=>finish(false);
+    /* iPhone's WebKit does not load a video until it is asked to play, so ask right away and reveal it once frames arrive */
+    next.onloadeddata=()=>{
+      next.onloadeddata=null;
+      next.classList.add("top","shown"); cur.classList.remove("top");
+      setTimeout(()=>{cur.classList.remove("shown");cur.pause();},360);
+      front=1-front;
+      clearTimeout(guard);guard=setTimeout(()=>finish(true),((next.duration||10)+4)*1000);  // stalled midway
+    };
+    next.onended=()=>finish(true);
+    next.classList.toggle("flip",flipNext);
+    next.src=URL_OF[name];
+    const p=next.play(); if(p&&p.catch)p.catch(()=>{});
+  });
+}
+/* a pause that a request can cut short */
+function rest(ms){return new Promise(res=>{resting=true;const t=setTimeout(()=>{resting=false;wake=null;res();},ms);wake=()=>{clearTimeout(t);resting=false;wake=null;res();};});}
+
+/* shortest path between poses, as a list of transition clips */
+function path(from,to){
+  if(from===to)return [];
+  const prev={[from]:null},q=[from];
+  while(q.length){const p=q.shift();for(const n in (EDGES[p]||{})){if(!(n in prev)){prev[n]=p;q.push(n);}}}
+  if(!(to in prev))return [];
+  const out=[];let n=to;while(prev[n]!==null){out.unshift({clip:EDGES[prev[n]][n],to:n});n=prev[n];}
+  return out;
+}
+
+/* what to do after an idle: the pet's own odds, nudged by how it feels */
+function choose(){
+  const pp=P.poses[pose];
+  const lon=lonely(), hun=hungry(), thi=thirsty();
+  // wants company: come up and look for you (not in the middle of the night)
+  if(lon>0.7&&!isNight()&&pose!==P.call.pose&&Math.random()<0.35){nextLabel=M.lonelyLabel;return P.call.pose;}
+  const careOf=id=>P.care.find(c=>c.id===id);
+  if(hun>0.8&&careOf("treat")&&Math.random()<0.25){const to=careOf("treat").pose;if(to!==pose){nextLabel=M.hungryLabel;return to;}}
+  if(thi>0.8&&careOf("water")&&Math.random()<0.25){const to=careOf("water").pose;if(to!==pose){nextLabel=M.thirstyLabel;return to;}}
+  // lonely pets do not settle into long naps
+  const stay=pp.stayIdles?[lon>0.7?1:pp.stayIdles[0],lon>0.7?2:pp.stayIdles[1]]:null;
+  if(stay&&idleCount<rnd(stay[0],stay[1]))return null;
+  const odds=(isNight()&&pp.nightNext)||pp.next;
+  const pick=weighted(Object.entries(odds),([,w])=>w)[0];
+  return pick==="stay"?null:pick;
+}
+/* the plain idle (first) comes up by its weight; the habits fill the rest and never repeat back to back */
+function pickIdle(p){
+  if(forceIdle){const f=P.poses[p].idles.find(x=>x.clip===forceIdle);forceIdle="";if(f){lastIdle=f.clip;return f;}}
+  const list=P.poses[p].idles.filter((x,i)=>i===0||x.clip!==lastIdle);
+  const pick=weighted(list);lastIdle=pick.clip;return pick;
+}
+/* how a care goes also depends on mood: a lonely pet melts into petting, one petted again and again starts ducking away */
+function careClip(id){
+  const c=P.care.find(x=>x.id===id);
+  if(id!=="pet")return weighted(c.outcomes);
+  const recent=mood.pets.filter(x=>now()-x<10*60e3).length, lon=lonely();
+  return weighted(c.outcomes,o=>{
+    const avoid=/dodge|いや/.test(o.clip+o.label);
+    return o.weight*(avoid?(recent>=3?2.5:1)*(lon>0.6?0.5:1):(lon>0.6?1.5:1));
+  });
+}
+function markButtons(){document.querySelectorAll("[data-pose]").forEach(b=>b.classList.toggle("on",b.dataset.pose===pose));}
+function idleLabel(idle){
+  if(greet){greet=false;return M.greetLabel;}
+  if(idle.label)return idle.label;
+  const pp=P.poses[pose];
+  if(hungry()>0.8&&P.care.some(c=>c.id==="treat"&&c.pose===pose))return M.hungryLabel;
+  if(thirsty()>0.8&&P.care.some(c=>c.id==="water"&&c.pose===pose))return M.thirstyLabel;
+  if(lonely()>0.7&&pose===P.call.pose&&!isNight())return M.lonelyLabel;
+  return (isNight()&&pp.nightLabel)||pp.label;
+}
+
+/* the life loop: one at a time, numbered (gen). A request starts a new loop and the old one quietly ends. */
+async function live(g){
+  while(g===gen){
+    if(queue.length){
+      const s=queue.shift();
+      tag.textContent=s.label||nextLabel||(s.to===P.call.pose&&called?P.call.label:(P.poses[s.to].arriveLabel||P.movingLabel));
+      nextLabel="";
+      moving=s.to; await play(s.clip); if(g!==gen)return;
+      pose=s.to; moving=null; idleCount=0; markButtons(); native({type:"pose",pose}); showFeeling();
+      continue;
+    }
+    if(called&&pose===P.call.pose)called=false;
+    if(forceWalk&&P.walk&&pose===P.walk.from){forceWalk=false;await walkAround(g);if(g!==gen)return;continue;}
+    /* after a pose change, always spend at least one idle in the new pose */
+    const next=(idleCount===0||now()<holdUntil)?null:choose();  // after a pose change, or while matching the widget, stay put
+    if(next){const q=path(pose,next);if(q.length){queue=q;continue;}}
+    nextLabel="";
+    const idle=pickIdle(pose);
+    tag.textContent=idleLabel(idle);
+    native({type:"pose",pose,idle:idle.clip}); showFeeling();
+    idleCount++;
+    const ok=await play(idle.clip); if(g!==gen)return;
+    if(!ok)await rest(800);   // a missing clip: wait a beat instead of spinning
+    if(g!==gen)return;
+    /* sometimes just stay still for a moment, like a real animal */
+    if(!queue.length&&!P.poses[pose].noHold&&Math.random()<(P.holdChance||0)){await rest(rnd(1200,3500));}
+    if(g!==gen)return;
+    /* the desktop pet sometimes goes for a slow little walk along the floor (not at night) */
+    if(petMode&&P.walk&&pose===P.walk.from&&!queue.length&&idleCount>1&&!isNight()&&Math.random()<(P.walk.chance||0.3)){await walkAround(g);if(g!==gen)return;}
+  }
+}
+function restart(){endWalk();gen++;if(stopPlay)stopPlay();if(wake)wake();live(gen);}
+
+/* walking (desktop pet only): start → loop a few times while the Mac app moves the window along the floor → stop facing you.
+   The app answers which way there is room to go (walkDir); hovering, a press or the screen edge ends the walk early. */
+let roam=true, forceWalk=false, walking=false, walkPhase="", stopWalk=false, walkAnswer=null;
+async function walkAround(g){
+  const W=P.walk; stopWalk=false;
+  /* roaming turned off in the menu: stay put and just turn around once on the spot */
+  if(!roam){if(W.spin){walking=true;walkPhase="spin";moving=W.from;tag.textContent=W.spinLabel||"";await play(W.spin);if(g===gen)endWalk();}return;}
+  let dir=Math.random()<0.5?1:-1;
+  dir=await new Promise(res=>{walkAnswer=res;native({type:"walkPlan",dir});setTimeout(()=>res(dir),400);});
+  walkAnswer=null;
+  if(!dir||g!==gen||stopWalk)return;
+  walking=true;flipNext=dir<0;moving=W.from;tag.textContent=W.label||"";
+  walkPhase="start";
+  if(await play(W.start)&&g===gen&&!stopWalk){
+    native({type:"walk",dir,speed:W.speed||0.13});
+    walkPhase="loop";
+    const n=Math.round(rnd(W.loops[0],W.loops[1]));
+    for(let i=0;i<n&&g===gen&&!stopWalk;i++)await play(W.loop);
+    native({type:"walkStop"});
+    walkPhase="stop";
+    if(g===gen)await play(W.stop);
+  }
+  if(g===gen)endWalk();
+}
+function endWalk(){if(walking)native({type:"walkStop"});walking=false;walkPhase="";flipNext=false;if(moving===(P&&P.walk&&P.walk.from))moving=null;}
+function walkHalt(){if(!walking)return;stopWalk=true;if(walkPhase==="loop"&&stopPlay)stopPlay();}
+
+/* a request interrupts a calm idle or pause right away; a pose change already underway finishes first, then the new plan runs */
+function request(to,care){
+  const q=path(moving||pose,to);
+  if(care){const o=careClip(care);q.push({clip:o.clip,to,label:o.label});if(o.label){nextLabel=o.label;tag.textContent=o.label;}}
+  if(!q.length)return;
+  queue=q;
+  if(walking){walkHalt();return;}
+  if(moving)return;
+  restart();
+}
+function doCare(id){const c=P.care.find(x=>x.id===id);if(!c)return;called=false;cared(id);request(c.pose,c.id);}
+function call(){called=true;touched();tag.textContent=P.call.label;request(P.call.pose);}
+/* tapping does what the pet's own table says for the pose it is in */
+function tap(){
+  if(!P)return;
+  const act=P.tap[moving||pose]||P.tap["*"];
+  if(act==="call")call();else doCare(act);
+}
+if(!petMode){stage.addEventListener("click",tap);stage.addEventListener("pointerdown",()=>native({type:"haptic"}));}
+/* the desktop pet: press and move to carry it (the Mac app moves the window); a press without moving is a tap */
+if(petMode){
+  let down=null,dragging=false;
+  /* 持ち運びは左ボタンだけ。右クリック・control+クリックはメニュー（メニューが「離した」を受け取るので、ここで始めると押しっぱなし扱いになる） */
+  stage.addEventListener("pointerdown",e=>{if(e.button!==0||e.ctrlKey)return;walkHalt();down={x:e.screenX,y:e.screenY};dragging=false;stage.setPointerCapture(e.pointerId);});
+  document.addEventListener("mouseenter",walkHalt);
+  document.addEventListener("contextmenu",e=>{e.preventDefault();down=null;dragging=false;native({type:"menu"});});
+  stage.addEventListener("pointermove",e=>{
+    if(!down)return;
+    if(e.buttons===0){down=null;dragging=false;return;}  /* 離したのに知らせが届かなかった（メニュー・ほかの窓）: 持ち運びをやめる */
+    const dx=e.screenX-down.x,dy=e.screenY-down.y;
+    if(!dragging&&Math.hypot(dx,dy)<4)return;
+    dragging=true;native({type:"drag",dx,dy});down={x:e.screenX,y:e.screenY};
+  });
+  stage.addEventListener("pointercancel",()=>{down=null;dragging=false;});
+  stage.addEventListener("pointerup",()=>{if(!down)return;if(dragging){native({type:"drop"});touched();}else tap();down=null;dragging=false;});
+}
+stage.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();tap();}});
+
+/* the Mac desk window: a menu button on hover; choosing anything closes the list again */
+const deskList=$("deskList"),bDesk=$("bDeskMenu");
+const setDesk=open=>{deskList.hidden=!open;bDesk.setAttribute("aria-expanded",String(open));};
+bDesk.onclick=e=>{e.stopPropagation();setDesk(deskList.hidden);};
+deskList.addEventListener("click",()=>setDesk(false),true);  // capture: the buttons stop the click from bubbling
+document.addEventListener("mouseleave",()=>setDesk(false));
+
+/* browsers pause muted video that scrolls out of view or sits in a background tab; resume it so the chain of clips never stalls */
+let frozen=false;
+function resume(){const v=layers[front];if(!frozen&&v.src&&v.paused&&!v.ended){const p=v.play();if(p&&p.catch)p.catch(()=>{});}}
+setInterval(resume,1000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)resume();});
+
+/* the room takes the colour of the wall behind the pet in the current clip, so the video's edge disappears */
+const probe=document.createElement("canvas");probe.width=probe.height=1;
+const pctx=probe.getContext("2d",{willReadFrequently:true});
+function matchRoom(){
+  const v=layers[front];if(!v.videoWidth)return;
+  try{pctx.drawImage(v,v.videoWidth*0.02,v.videoHeight*0.04,v.videoWidth*0.06,v.videoHeight*0.06,0,0,1,1);
+    const d=pctx.getImageData(0,0,1,1).data;document.documentElement.style.setProperty("--room",`rgb(${d[0]},${d[1]},${d[2]})`);}catch(_){}
+}
+if(!petMode)setInterval(matchRoom,1500);
+
+/* keep the screen on while the pet is shown (a dedicated device on a stand), where the browser allows it */
+async function keepAwake(){try{if("wakeLock" in navigator&&!document.hidden)await navigator.wakeLock.request("screen");}catch(_){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&P)keepAwake();});
+
+/* native apps (menu bar item, widget buttons) call these */
+/* jump straight to a pose and idle (the iPhone app, coming back after a while: match what the widget has been showing) */
+function sync(p,idle){
+  if(!P||!P.poses[p])return;
+  queue=[];moving=null;pose=p;idleCount=0;forceIdle=idle||"";holdUntil=now()+30e3;nextLabel="";
+  markButtons();showFeeling();restart();
+}
+window.uchinoko={care:id=>P&&doCare(id),sync,walkDir:d=>{if(walkAnswer)walkAnswer(d);},walkHalt,setRoam:on=>{roam=!!on;if(!roam)walkHalt();},
+  walk:()=>{if(!petMode||!P||!P.walk||walking)return;forceWalk=true;if(pose!==P.walk.from)request(P.walk.from);else restart();},pose:p=>{if(P&&P.poses[p]){touched();request(p);}},call:()=>P&&call(),
+  mood:()=>P&&({lonely:lonely(),hungry:hungry(),thirsty:thirsty(),pose}),
+  /* for store screenshots (debug builds only call this): stop on one frame of a clip */
+  shot:(clip,sec,label)=>{if(!P||!URL_OF[clip])return;frozen=true;gen++;if(stopPlay)stopPlay();if(wake)wake();
+    const v=layers[1-front],cur=layers[front];v.onended=null;
+    /* iPhone does not repaint a paused, seeked video, so let it play and stop it when it reaches the moment */
+    v.ontimeupdate=()=>{if(v.currentTime>=(+sec||0)){v.pause();v.ontimeupdate=null;}};
+    v.onloadeddata=()=>{v.onloadeddata=null;v.classList.add("top","shown");cur.classList.remove("top","shown");cur.pause();front=1-front;tag.textContent=label||"";
+      const cz=P.care.find(c=>c.outcomes.some(o=>o.clip===clip));const pz=cz?cz.pose:Object.keys(P.poses).find(k=>clip.includes(k));if(pz){pose=pz;shownFeel="";showFeeling();}};  // the badge follows the pose shown
+    v.src=URL_OF[clip];const p=v.play();if(p&&p.catch)p.catch(()=>{});}};
+
+async function start(pet){
+  P=pet;M=Object.assign({},MOOD_DEFAULT,P.mood||{});EDGES={};
+  P.transitions.forEach(t=>{(EDGES[t.from]=EDGES[t.from]||{})[t.to]=t.clip;});
+  if(!P.poses[P.start])P.start=Object.keys(P.poses)[0];
+  const handed=window.__UCHINOKO_NOW__;
+  if(handed&&P.poses[handed.pose]){P.start=handed.pose;forceIdle=handed.idle||"";holdUntil=now()+30e3;}
+  pose=P.start;loading.textContent=P.name+"を呼んでいます…";loading.hidden=false;
+  loadMood();
+  setupUI();
+  await preload();
+  loading.hidden=true;markButtons();showFeeling();
+  /* back after a long while: the pet gets up to greet you */
+  const away=now()-mood.touch;
+  if(handed){if(away>M.greetAfterHours*3600e3&&!isNight()&&pose!=="sleep")greet=true;}  // stay as the widget showed; just say hello
+  else if(away>M.greetAfterHours*3600e3&&!isNight()){const q=path(pose,P.call.pose);if(q.length){q[q.length-1].label=M.greetLabel;queue=q;}else greet=true;}
+  if(!handed)touched();  /* the iPhone app keeps the widget's feeling until you actually touch or care */
+  restart();keepAwake();
+  native({type:"ready",walk:!!(petMode&&P.walk),name:P.name,care:P.care.map(c=>[c.id,c.button]),poses:Object.entries(P.poses).map(([k,v])=>[k,v.button]),call:P.call.button});
+}
+
+/* boot: ?pet=<id> (native apps, or a link) wins, then the site's own pet (catalog.json "only": a site that shows one pet
+   and no shelf, like the browser sample), then the pet last here; ?shelf=1 or nothing remembered opens the shelf */
+let onlyPet=null;
+(async()=>{
+  try{const r=await fetch("pets/catalog.json",{cache:"no-cache"});if(r.ok)onlyPet=(await r.json()).only||null;}catch(_){}
+  const id=params.get("pet")||onlyPet||(params.get("shelf")?null:ls.get(CUR,null));
+  if(id){try{const pet=await loadPet(id);if(!onlyPet)remember(pet);return start(pet);}catch(_){}}
+  showShelf();
+})();
+})();
+</script>
