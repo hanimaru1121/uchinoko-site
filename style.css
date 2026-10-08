@@ -293,3 +293,17 @@ html.motion .reveal.in{opacity:1;transform:none}
   .tabs button{font-size:13.5px;padding:8px 14px;flex:none;scroll-snap-align:start}
   .walker{width:72px}
 }
+
+/* ガイド記事 */
+.article{padding-block:48px 24px}
+.article h1{font-size:clamp(26px,4vw,38px);line-height:1.35;margin-bottom:10px}
+.article h2{font-size:clamp(21px,2.6vw,26px);margin:44px 0 12px}
+.article p,.article li{color:var(--ink-2);line-height:1.95}
+.article .lead{font-size:17px;color:var(--ink)}
+.article ul{padding-left:1.3em;margin:10px 0}
+.article li{margin:8px 0}
+.article table.cmp{width:100%;border-collapse:collapse;margin:22px 0;font-size:14.5px}
+.article .cmp th,.article .cmp td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+.article .cmp thead th{background:var(--paper-2)}
+.article .cmp tbody th{white-space:nowrap;background:var(--paper-2)}
+@media(max-width:600px){.article table.cmp{font-size:13px}.article .cmp th,.article .cmp td{padding:8px}}
