@@ -14,6 +14,44 @@
     vids.forEach(v => io.observe(v));
   }
 
+  /* Mac のデスクトップ（イメージ）: 背景を抜いた動画（Safari は .mov、ほかは .webm）。見えたら再生 */
+  const macPet = document.querySelector(".mac-pet video");
+  if (macPet && !reduce) {
+    const safari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+    if (safari || macPet.canPlayType('video/webm; codecs="vp9"')) {
+      const io3 = new IntersectionObserver(es => es.forEach(e => {
+        if (e.isIntersecting) {
+          if (!macPet.src) { macPet.src = `/assets/walk-idle_sit.${safari ? "mov" : "webm"}`; macPet.onplaying = () => macPet.classList.add("on"); }
+          macPet.play().catch(() => {});
+        } else macPet.pause();
+      }), { threshold: 0.3 });
+      io3.observe(macPet);
+    }
+  }
+
+  /* 計測（GA4）: 相談ボタンなどが押された回数。GA4 が無いページでは何もしない */
+  document.addEventListener("click", e => {
+    const a = e.target.closest("[data-cta]");
+    if (a && window.gtag) gtag("event", "cta_click", { cta: a.dataset.cta, link_url: a.href });
+  });
+  document.querySelectorAll(".faq details").forEach(d => d.addEventListener("toggle", () => {
+    if (d.open && window.gtag) gtag("event", "faq_open", { question: d.querySelector("summary").textContent.slice(0, 80) });
+  }));
+
+  /* スマホの下のボタン: 最初の画面を過ぎてから、相談の段が見えるまで */
+  const bar = document.querySelector(".m-cta"), hero = document.querySelector(".hero"), contact = document.querySelector(".contact-sec");
+  if (bar && hero && contact && "IntersectionObserver" in window) {
+    let pastHero = false, atContact = false;
+    const upd = () => {
+      const on = pastHero && !atContact;
+      bar.classList.toggle("on", on);
+      bar.setAttribute("aria-hidden", on ? "false" : "true");
+      bar.querySelector("a").tabIndex = on ? 0 : -1;
+    };
+    new IntersectionObserver(es => { pastHero = !es[0].isIntersecting; upd(); }).observe(hero);
+    new IntersectionObserver(es => { atContact = es[0].isIntersecting; upd(); }, { threshold: 0.15 }).observe(contact);
+  }
+
   /* スクロールで現れる */
   const rv = document.querySelectorAll(".reveal");
   if (!reduce && "IntersectionObserver" in window) {
@@ -28,13 +66,18 @@
   if (box) {
     const range = box.querySelector(".c-range");
     const set = v => box.style.setProperty("--pos", v + "%");
-    range.addEventListener("input", () => set(range.value));
+    let told = false;
+    range.addEventListener("input", () => {
+      set(range.value);
+      if (!told && window.gtag) { told = true; gtag("event", "compare_slide"); }
+    });
     const S = window.UK_SAMPLES || { names: {} };
     const photo = box.querySelector(".c-photo"), portrait = box.querySelector(".c-portrait");
     const tabs = document.querySelectorAll(".tabs [role=tab]");
     const pick = btn => {
       const n = btn.dataset.pet;
       tabs.forEach(b => b.setAttribute("aria-selected", b === btn ? "true" : "false"));
+      if (window.gtag) gtag("event", "sample_pick", { pet: n });
       box.classList.add("swap");
       const done = () => box.classList.remove("swap");
       portrait.src = `/assets/${n}-portrait.jpg`; portrait.alt = `${S.portrait}: ${S.names[n] || ""}`;
