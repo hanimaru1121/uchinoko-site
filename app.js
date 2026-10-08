@@ -5,13 +5,17 @@
 
   /* 動画: 画面に入ったら再生、外れたら止める（通信量と電池） */
   const vids = document.querySelectorAll("main video");
-  if (reduce) vids.forEach(v => { v.controls = true; });
+  if (reduce) vids.forEach(v => { v.controls = true; v.autoplay = false; v.pause(); });
   else {
+    const shown = new Set();
     const io = new IntersectionObserver(es => es.forEach(e => {
       const v = e.target;
-      if (e.isIntersecting) { if (v.preload === "none") v.preload = "auto"; v.play().catch(() => {}); } else v.pause();
+      if (e.isIntersecting) { shown.add(v); if (v.preload === "none") v.preload = "auto"; v.play().catch(() => {}); } else { shown.delete(v); v.pause(); }
     }), { threshold: 0.3 });
     vids.forEach(v => io.observe(v));
+    /* タブが裏に回ると動画が止まることがある。表に戻ったら、見えている動画を再生し直す */
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) shown.forEach(v => v.play().catch(() => {})); });
+    addEventListener("pageshow", () => shown.forEach(v => v.play().catch(() => {})));
   }
 
   /* Mac のデスクトップ（イメージ）: 背景を抜いた動画（Safari は .mov、ほかは .webm）。見えたら再生 */
