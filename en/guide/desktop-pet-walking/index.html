@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way | Uchinoko Live</title>
+<meta name="description" content="The four ways desktop pets move on a Mac (along the bottom, chasing the cursor, on window edges, in the Dock), plus tips to help keep them out of the way during work and video calls.">
+<link rel="canonical" href="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="ja" href="https://uchinoko.live/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="en" href="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="x-default" href="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<meta property="og:title" content="A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way">
+<meta property="og:description" content="The four ways desktop pets move on a Mac (along the bottom, chasing the cursor, on window edges, in the Dock), plus tips to help keep them out of the way during work and video calls.">
+<meta property="og:image" content="https://uchinoko.live/assets/og.jpg">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="/assets/icon-180.png">
+<link rel="apple-touch-icon" href="/assets/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way", "description": "The four ways desktop pets move on a Mac (along the bottom, chasing the cursor, on window edges, in the Dock), plus tips to help keep them out of the way during work and video calls.", "inLanguage": "en", "datePublished": "2026-10-08", "dateModified": "2026-10-08", "mainEntityOfPage": "https://uchinoko.live/en/guide/desktop-pet-walking/", "author": {"@type": "Person", "name": "Takuya Ito"}, "publisher": {"@type": "Organization", "name": "Uchinoko Live", "url": "https://uchinoko.live/en/"}}</script>
+<script>
+(() => {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  const deny = { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" };
+  gtag("consent", "default", { ...deny, analytics_storage: "granted" });
+  gtag("consent", "default", { ...deny, analytics_storage: "denied", region: ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO", "GB", "CH"] });
+  let saved = null; try { saved = localStorage.getItem("uk-consent"); } catch (e) {}
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+  const ask = /^Europe\//.test(tz) || /^Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe)$/.test(tz);
+  const load = () => {
+    if (window.__ga) return; window.__ga = 1;
+    const s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=G-GWMXJ5DZPL";
+    document.head.appendChild(s); gtag("js", new Date()); gtag("config", "G-GWMXJ5DZPL");
+  };
+  if (saved === "yes") { gtag("consent", "update", { analytics_storage: "granted" }); load(); }
+  else if (!ask && saved !== "no") load();
+  /* 同意のバナー: 同意が要る地域でまだ選んでいない人に出す。下の「Cookie の設定」からは誰でも開き直して変えられる */
+  addEventListener("DOMContentLoaded", () => {
+    const b = document.querySelector(".consent"); if (!b) return;
+    const done = v => { try { localStorage.setItem("uk-consent", v); } catch (e) {} b.hidden = true;
+      gtag("consent", "update", { analytics_storage: v === "yes" ? "granted" : "denied" });
+      if (v === "yes") load();
+      else document.cookie.split("; ").map(c => c.split("=")[0]).filter(n => /^_ga/.test(n)).forEach(n => {
+        for (const d of ["", "; domain=." + location.hostname.replace(/^www\./, "")]) document.cookie = n + "=; max-age=0; path=/" + d;
+      }); };
+    b.querySelector(".c-yes").onclick = () => done("yes");
+    b.querySelector(".c-no").onclick = () => done("no");
+    const open = document.querySelector(".cookie-open");
+    if (open) { open.hidden = false; open.onclick = () => { b.hidden = false; }; }
+    if (ask && !saved) b.hidden = false;
+  });
+})();
+</script>
+</head>
+<body class="lang-en guide">
+<header class="bar"><div class="wrap">
+  <a class="logo" href="/en/"><img src="/assets/icon-180.png" alt="" width="30" height="30">Uchinoko Live</a>
+  <a class="btn btn-sm" data-cta="header" href="/en/">Home</a>
+</div></header>
+<main id="main"><article class="wrap narrow article">
+  <p class="kicker"><a href="/en/guide/">Guide</a></p>
+  <h1>A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way</h1>
+  <p class="fine">Published October 8, 2026</p>
+  <p class="lead">A cat padding along the bottom of your screen, stopping to sit, then curling up for a nap. Desktop pets have been a small joy for computer lovers for decades. This guide covers the different ways they move around, and how to set one up so it stays out of the way during work and video calls. For app recommendations, see <a href="/en/guide/desktop-pet-mac/">Desktop pets for Mac: how to get started</a>.</p>
+
+<h2>Four ways desktop pets move</h2>
+<p>Two apps can both be called "desktop pets" and behave completely differently. Knowing the types up front saves you from installing something that isn't what you pictured.</p>
+
+<h3>1. Walking along the bottom of the screen</h3>
+<p>The pet strolls back and forth above the Dock, sits, and sleeps. It stays at the edge of your vision, which makes it the calmest type and the easiest to leave on all day.</p>
+
+<h3>2. Chasing your cursor</h3>
+<p>The classic "cat chases the mouse" style. Move the cursor and the pet follows; stop, and it curls up nearby. Adorable, but busy, so look for a way to pause it when you need to focus.</p>
+
+<h3>3. Walking along window edges</h3>
+<p>The pet walks along the top of your open windows or climbs up their sides. Some fall off when you move the window. Lively and fun to watch.</p>
+
+<h3>4. Living in the Dock or menu bar</h3>
+<p>The pet animates inside the Dock or the menu bar. It takes up almost no space, so it's great on a small laptop screen, though the pet looks small too.</p>
+
+<div class="tbl"><table class="cmp">
+<thead><tr><th>Movement</th><th>How distracting</th><th>Good for</th></tr></thead>
+<tbody>
+<tr><th>Along the bottom</th><td>Low</td><td>Leaving it on during work</td></tr>
+<tr><th>Chasing the cursor</th><td>High</td><td>Playing during breaks</td></tr>
+<tr><th>Along window edges</th><td>Medium</td><td>People who like a lively screen</td></tr>
+<tr><th>Dock or menu bar</th><td>Low</td><td>Small screens, low-key setups</td></tr>
+</tbody>
+</table></div>
+
+<h2>Tips to keep it out of the way</h2>
+<h3>Start small</h3>
+<p>A pet that shows up larger than expected quickly becomes distracting. If you can resize it, start small and scale up if you want more.</p>
+
+<h3>Check whether clicks pass through</h3>
+<p>When you click on the pet, does the click reach the file or button underneath? Apps differ. If clicks don't pass through, the spot where the pet sits becomes unclickable. Try clicking on it once right after installing.</p>
+
+<h3>Know how to hide it before you share your screen</h3>
+<p>If you share your entire screen in a video call, your desktop pet may be visible to others. Check that you can hide or quit it quickly from the menu bar, and look at your screen-sharing preview before the call.</p>
+
+<h3>Full-screen apps and external displays</h3>
+<p>On a Mac, a full-screen app opens in its own space. Whether the pet follows you there, and which display it appears on, varies by app. If that matters to you, choose one that lets you pick the display.</p>
+
+<h3>Watch the battery</h3>
+<p>Anything animating all day uses some battery. Open Activity Monitor and check the Energy tab to see how much. You can also pause the pet when you're unplugged.</p>
+
+<h2>What makes it feel like a real cat or dog?</h2>
+<p>Oddly, it's often not the movement but the <b>stillness</b>. Walk, pause, sit, yawn, curl up. A pet that sometimes does nothing at all feels far more present than one that never stops moving. When you compare apps, watch their preview videos for how the pet behaves when it's idle.</p>
+
+<h2>Want your own pet walking on your screen?</h2>
+<p>More people want their own cat or dog on screen rather than a stock character. We cover the options in <a href="/en/guide/my-pet-desktop/">How to turn your own pet into a desktop pet</a>. Uchinoko Live is a service that brings your pet to your Mac desktop from your photos (<a href="/en/">learn more</a>).</p>
+  <p class="fine">This guide is published by Uchinoko Live, a made-to-order service that uses AI to create pet portraits and short videos from photos.</p>
+  <div class="center"><a class="btn" data-cta="guide" href="https://s8j340vhd2r.typeform.com/to/sbTzPftB#src=guide-desktop-pet-walking" target="_blank" rel="noopener">Send photos for a free review</a></div>
+  <nav class="more"><h2>More guides</h2><ul><li><a href="/en/guide/desktop-pet-mac/">Desktop Pets for Mac: How to Get Started and Pick the Right One</a></li><li><a href="/en/guide/my-pet-desktop/">How to Turn Your Own Pet Into a Desktop Pet: Make It Yourself or Have It Made</a></li><li><a href="/en/guide/pet-widget-iphone/">How to Put a Pet Widget on Your iPhone Home Screen: Photos, Pixel Pets and Virtual Pets</a></li><li><a href="/en/guide/pet-wallpaper-iphone/">Pet Wallpaper for iPhone: Live Photos, Lock Screen Tricks, and Photos That Look Great</a></li><li><a href="/en/guide/photo-to-video/">How to Animate a Photo of Your Pet: Three Approaches, and How to Pick the Right Photos</a></li></ul></nav>
+</article></main>
+<footer><div class="wrap">
+  <nav><a href="/en/terms.html">Terms</a><a href="/en/privacy.html">Privacy</a><a href="/en/guide/">Guides</a><a href="/guide/desktop-pet-walking/" hreflang="ja" lang="ja">日本語</a><button type="button" class="cookie-open" hidden>Cookie settings</button></nav>
+  <p>Uchinoko Live is run by Takuya Ito, a sole proprietor in New York, USA. Contact: hello@uchinoko.live</p>
+  <p>iPhone, Mac, App Store and Live Photo are trademarks of Apple Inc., registered in the U.S. and other countries.</p>
+  <p>© 2026 Uchinoko Live</p>
+</div></footer>
+<div class="consent" hidden role="dialog" aria-live="polite" aria-label="Cookie">
+  <p>We use Google Analytics cookies to understand how this site is used. You can choose here whether we use them. <a href="/en/privacy.html">Privacy</a></p>
+  <div><button type="button" class="c-no">Decline</button><button type="button" class="c-yes">Accept</button></div>
+</div>
+<script src="/app.js" defer></script>
+</body>
+</html>

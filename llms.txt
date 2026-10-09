@@ -5,7 +5,22 @@
 
 - 日本語: https://uchinoko.live/
 - English: https://uchinoko.live/en/
-- ガイド（ペットの写真を動かす方法の違いと写真の選び方）: https://uchinoko.live/guide/photo-to-video/
+- ガイドの一覧: https://uchinoko.live/guide/
+- ガイド（デスクトップペットの始め方と選び方：Mac で画面のすみにペットを置く）: https://uchinoko.live/guide/desktop-pet-mac/
+- ガイド（Mac の画面を猫や犬が歩く：動き方の種類と、じゃまにならない置き方）: https://uchinoko.live/guide/desktop-pet-walking/
+- ガイド（うちの子をデスクトップペットにする方法：自分で作るか、作ってもらうか）: https://uchinoko.live/guide/my-pet-desktop/
+- ガイド（iPhone のホーム画面にペットのウィジェットを置く方法：写真・ドット絵・育てるペット）: https://uchinoko.live/guide/pet-widget-iphone/
+- ガイド（ペットの写真で iPhone の壁紙を作る：動く壁紙・ロック画面のコツ）: https://uchinoko.live/guide/pet-wallpaper-iphone/
+- ガイド（ペットの写真を動かしたい：方法の違いと、写真の選び方）: https://uchinoko.live/guide/photo-to-video/
+- ガイド（ペットの写真をスマホでかわいく撮るコツ：光・目線・ピント・動く子の撮り方）: https://uchinoko.live/guide/pet-photo-tips/
+- Guides: https://uchinoko.live/en/guide/
+- Guide (Desktop Pets for Mac: How to Get Started and Pick the Right One): https://uchinoko.live/en/guide/desktop-pet-mac/
+- Guide (A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way): https://uchinoko.live/en/guide/desktop-pet-walking/
+- Guide (How to Turn Your Own Pet Into a Desktop Pet: Make It Yourself or Have It Made): https://uchinoko.live/en/guide/my-pet-desktop/
+- Guide (How to Put a Pet Widget on Your iPhone Home Screen: Photos, Pixel Pets and Virtual Pets): https://uchinoko.live/en/guide/pet-widget-iphone/
+- Guide (Pet Wallpaper for iPhone: Live Photos, Lock Screen Tricks, and Photos That Look Great): https://uchinoko.live/en/guide/pet-wallpaper-iphone/
+- Guide (How to Animate a Photo of Your Pet: Three Approaches, and How to Pick the Right Photos): https://uchinoko.live/en/guide/photo-to-video/
+- Guide (How to Take Better Pet Photos With Your Phone: Light, Eye Level, Focus and Fast Movers): https://uchinoko.live/en/guide/pet-photo-tips/
 - 特定商取引法に基づく表記: https://uchinoko.live/tokushoho.html
 - 利用規約: https://uchinoko.live/terms.html
 - Terms: https://uchinoko.live/en/terms.html

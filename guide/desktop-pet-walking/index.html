@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mac の画面を猫や犬が歩く：動き方の種類と、じゃまにならない置き方｜うちの子ライブ</title>
+<meta name="description" content="Mac の画面で猫や犬を歩かせるデスクトップペットの、動き方の種類（下を歩く・カーソルを追う・窓に乗る・Dock に住む）と、仕事のじゃまにならない設定のコツをまとめました。">
+<link rel="canonical" href="https://uchinoko.live/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="ja" href="https://uchinoko.live/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="en" href="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<link rel="alternate" hreflang="x-default" href="https://uchinoko.live/en/guide/desktop-pet-walking/">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://uchinoko.live/guide/desktop-pet-walking/">
+<meta property="og:title" content="Mac の画面を猫や犬が歩く：動き方の種類と、じゃまにならない置き方">
+<meta property="og:description" content="Mac の画面で猫や犬を歩かせるデスクトップペットの、動き方の種類（下を歩く・カーソルを追う・窓に乗る・Dock に住む）と、仕事のじゃまにならない設定のコツをまとめました。">
+<meta property="og:image" content="https://uchinoko.live/assets/og.jpg">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="/assets/icon-180.png">
+<link rel="apple-touch-icon" href="/assets/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Zen+Maru+Gothic:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "Mac の画面を猫や犬が歩く：動き方の種類と、じゃまにならない置き方", "description": "Mac の画面で猫や犬を歩かせるデスクトップペットの、動き方の種類（下を歩く・カーソルを追う・窓に乗る・Dock に住む）と、仕事のじゃまにならない設定のコツをまとめました。", "inLanguage": "ja", "datePublished": "2026-10-08", "dateModified": "2026-10-08", "mainEntityOfPage": "https://uchinoko.live/guide/desktop-pet-walking/", "author": {"@type": "Person", "name": "伊藤拓也"}, "publisher": {"@type": "Organization", "name": "うちの子ライブ", "url": "https://uchinoko.live/"}}</script>
+<script>
+(() => {
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = function () { dataLayer.push(arguments); };
+  const deny = { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" };
+  gtag("consent", "default", { ...deny, analytics_storage: "granted" });
+  gtag("consent", "default", { ...deny, analytics_storage: "denied", region: ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "IS", "LI", "NO", "GB", "CH"] });
+  let saved = null; try { saved = localStorage.getItem("uk-consent"); } catch (e) {}
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || "");
+  const ask = /^Europe\//.test(tz) || /^Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe)$/.test(tz);
+  const load = () => {
+    if (window.__ga) return; window.__ga = 1;
+    const s = document.createElement("script"); s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=G-GWMXJ5DZPL";
+    document.head.appendChild(s); gtag("js", new Date()); gtag("config", "G-GWMXJ5DZPL");
+  };
+  if (saved === "yes") { gtag("consent", "update", { analytics_storage: "granted" }); load(); }
+  else if (!ask && saved !== "no") load();
+  /* 同意のバナー: 同意が要る地域でまだ選んでいない人に出す。下の「Cookie の設定」からは誰でも開き直して変えられる */
+  addEventListener("DOMContentLoaded", () => {
+    const b = document.querySelector(".consent"); if (!b) return;
+    const done = v => { try { localStorage.setItem("uk-consent", v); } catch (e) {} b.hidden = true;
+      gtag("consent", "update", { analytics_storage: v === "yes" ? "granted" : "denied" });
+      if (v === "yes") load();
+      else document.cookie.split("; ").map(c => c.split("=")[0]).filter(n => /^_ga/.test(n)).forEach(n => {
+        for (const d of ["", "; domain=." + location.hostname.replace(/^www\./, "")]) document.cookie = n + "=; max-age=0; path=/" + d;
+      }); };
+    b.querySelector(".c-yes").onclick = () => done("yes");
+    b.querySelector(".c-no").onclick = () => done("no");
+    const open = document.querySelector(".cookie-open");
+    if (open) { open.hidden = false; open.onclick = () => { b.hidden = false; }; }
+    if (ask && !saved) b.hidden = false;
+  });
+})();
+</script>
+</head>
+<body class="lang-ja guide">
+<header class="bar"><div class="wrap">
+  <a class="logo" href="/"><img src="/assets/icon-180.png" alt="" width="30" height="30">うちの子ライブ</a>
+  <a class="btn btn-sm" data-cta="header" href="/">トップへ</a>
+</div></header>
+<main id="main"><article class="wrap narrow article">
+  <p class="kicker"><a href="/guide/">ガイド</a></p>
+  <h1>Mac の画面を猫や犬が歩く：動き方の種類と、じゃまにならない置き方</h1>
+  <p class="fine">2026年10月8日 公開</p>
+  <p class="lead">作業中の画面のすみを、猫や犬がとことこ歩いている。デスクトップペットと呼ばれるこの楽しみは、昔からパソコン好きに愛されてきました。この記事では、画面を歩く子の「動き方」の種類と、仕事や会議のじゃまにならない置き方をまとめます。アプリの選び方は<a href="/guide/desktop-pet-mac/">デスクトップペットの始め方と選び方</a>に分けて書いています。</p>
+
+<h2>画面を歩く子の、動き方は4種類</h2>
+<p>同じ「デスクトップペット」でも、どこをどう動くかはアプリによってかなり違います。入れてから「思っていたのと違う」とならないよう、先に種類を知っておきましょう。</p>
+
+<h3>1. 画面の下を行き来する</h3>
+<p>Dock の上あたりや画面の下のふちを、左右に歩いたり、座ったり、寝たりします。視界の端にいるだけなので、作業の妨げになりにくい、いちばん落ち着いた型です。</p>
+
+<h3>2. マウスのカーソルを追いかける</h3>
+<p>昔ながらの「ねこがマウスを追う」型です。カーソルを動かすとついてきて、止めると近くで丸くなります。かわいい反面、動きが多いので、集中したいときは止められるものが安心です。</p>
+
+<h3>3. 窓のふちに乗る・よじのぼる</h3>
+<p>開いている窓（ウインドウ）の上のふちを歩いたり、横をよじのぼったりします。窓を動かすと落ちてくる、といった遊びがあるものも。にぎやかで、見ていて飽きない型です。</p>
+
+<h3>4. Dock やメニューバーに住む</h3>
+<p>画面の上の帯（メニューバー）や、Dock のアイコンの中で動くものです。場所をとらないので、画面が小さいノートの Mac でも気になりません。そのぶん、体は小さく見えます。</p>
+
+<div class="tbl"><table class="cmp">
+<thead><tr><th>動き方</th><th>じゃまになりにくさ</th><th>向いている人</th></tr></thead>
+<tbody>
+<tr><th>画面の下を行き来</th><td>なりにくい</td><td>仕事中もずっと出しておきたい</td></tr>
+<tr><th>カーソルを追う</th><td>動きが多い</td><td>休けい中に遊びたい</td></tr>
+<tr><th>窓のふちに乗る</th><td>ときどき重なる</td><td>にぎやかなのが好き</td></tr>
+<tr><th>Dock・メニューバー</th><td>なりにくい</td><td>画面が小さい・目立たせたくない</td></tr>
+</tbody>
+</table></div>
+
+<h2>じゃまにならない置き方のコツ</h2>
+<h3>大きさを、画面に合わせて小さめに</h3>
+<p>思ったより大きく出ると、すぐに気になってしまいます。大きさを変えられるなら、最初は小さめにして、物足りなければ大きくするのがおすすめです。</p>
+
+<h3>クリックが「下に通る」かを確かめる</h3>
+<p>ペットの上をクリックしたとき、その下にあるファイルやボタンに届くかどうかは、アプリによって違います。届かないと、ペットがいる場所だけ操作できなくなります。最初に一度、ペットの上でクリックしてみましょう。</p>
+
+<h3>画面を共有する前に、隠し方を覚えておく</h3>
+<p>オンライン会議で画面全体を共有すると、デスクトップペットが相手にも見える場合があります。メニューバーから一時的に隠せるか、すぐに終了できるかを確かめ、共有する前に表示を確認しておくと慌てません。</p>
+
+<h3>全画面のアプリや、外部ディスプレイでの出方</h3>
+<p>Mac では、全画面にしたアプリは別の「デスクトップ」として開きます。そこにもペットがついてくるか、外部ディスプレイのどちらに出るかは、アプリごとに違います。気になる場合は、設定で出す画面を選べるものを選びましょう。</p>
+
+<h3>電池の減りを確かめる</h3>
+<p>ずっと動いているものは、少しずつ電池を使います。「アクティビティモニタ」の「エネルギー」のタブで、どのくらい使っているかを見られます。電源につないでいないときは止める、といった使い分けもできます。</p>
+
+<h2>猫・犬「らしく」見えるのは、どんなとき？</h2>
+<p>画面の子を見ていて「本当に猫だな」と感じるのは、動きの種類よりも、<b>止まっている時間</b>だったりします。歩いて、立ち止まって、座って、あくびをして、丸くなる。ずっと動き続けるより、何もしていない時間がある子のほうが、そこに「いる」感じがします。選ぶときは、紹介の動画で、止まっているときの様子も見てみてください。</p>
+
+<h2>うちの子を歩かせたいときは</h2>
+<p>決まったキャラクターではなく、うちの猫や犬を画面で歩かせたい、という人も増えています。方法と、選ぶときに見ることは<a href="/guide/my-pet-desktop/">うちの子をデスクトップペットにする方法</a>にまとめました。うちの子ライブも、写真からその子を Mac のデスクトップに迎えるサービスです（<a href="/">くわしくはトップページ</a>）。</p>
+  <p class="fine">この記事は、AI を活用してペットの写真から絵と短い動画を届ける受注制作サービス「うちの子ライブ」が公開しています。</p>
+  <div class="center"><a class="btn" data-cta="guide" href="https://s8j340vhd2r.typeform.com/to/rXVzN8w5#src=guide-desktop-pet-walking" target="_blank" rel="noopener">写真を送って相談する</a></div>
+  <nav class="more"><h2>ほかのガイド</h2><ul><li><a href="/guide/desktop-pet-mac/">デスクトップペットの始め方と選び方：Mac で画面のすみにペットを置く</a></li><li><a href="/guide/my-pet-desktop/">うちの子をデスクトップペットにする方法：自分で作るか、作ってもらうか</a></li><li><a href="/guide/pet-widget-iphone/">iPhone のホーム画面にペットのウィジェットを置く方法：写真・ドット絵・育てるペット</a></li><li><a href="/guide/pet-wallpaper-iphone/">ペットの写真で iPhone の壁紙を作る：動く壁紙・ロック画面のコツ</a></li><li><a href="/guide/photo-to-video/">ペットの写真を動かしたい：方法の違いと、写真の選び方</a></li></ul></nav>
+</article></main>
+<footer><div class="wrap">
+  <nav><a href="/tokushoho.html">特定商取引法に基づく表記</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/guide/">ガイド</a><a href="/en/guide/desktop-pet-walking/" hreflang="en" lang="en">English</a><button type="button" class="cookie-open" hidden>Cookie の設定</button></nav>
+  <p>運営: 伊藤拓也（個人・アメリカ合衆国）｜お問い合わせ: hello@uchinoko.live</p>
+  <p>iPhone、Mac、App Store、Live Photo は、米国およびその他の国で登録された Apple Inc. の商標です。</p>
+  <p>© 2026 うちの子ライブ</p>
+</div></footer>
+<div class="consent" hidden role="dialog" aria-live="polite" aria-label="Cookie">
+  <p>このサイトは、使われ方を知るために Google アナリティクスの Cookie を使います。使うかどうかは、ここで選べます。 <a href="/privacy.html">詳しく</a></p>
+  <div><button type="button" class="c-no">同意しない</button><button type="button" class="c-yes">同意する</button></div>
+</div>
+<script src="/app.js" defer></script>
+</body>
+</html>

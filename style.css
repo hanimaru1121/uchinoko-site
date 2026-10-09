@@ -300,10 +300,19 @@ html.motion .reveal.in{opacity:1;transform:none}
 .article h2{font-size:clamp(21px,2.6vw,26px);margin:44px 0 12px}
 .article p,.article li{color:var(--ink-2);line-height:1.95}
 .article .lead{font-size:17px;color:var(--ink)}
-.article ul{padding-left:1.3em;margin:10px 0}
+.article ul,.article ol{padding-left:1.3em;margin:10px 0}
 .article li{margin:8px 0}
 .article table.cmp{width:100%;border-collapse:collapse;margin:22px 0;font-size:14.5px}
 .article .cmp th,.article .cmp td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
 .article .cmp thead th{background:var(--paper-2)}
 .article .cmp tbody th{white-space:nowrap;background:var(--paper-2)}
 @media(max-width:600px){.article table.cmp{font-size:13px}.article .cmp th,.article .cmp td{padding:8px}}
+.article .kicker a{color:inherit;text-decoration:none}
+.article .guide-list{list-style:none;padding:0}
+.article .guide-list li{margin:0;padding:18px 0;border-bottom:1px solid var(--line)}
+.article .guide-list span{font-size:14.5px}
+.article .more{margin-top:40px}
+.article .more h2{font-size:18px;margin-top:0}
+.article h3{font-size:clamp(17px,2vw,19px);margin:28px 0 8px}
+.article .note{font-size:14px;color:var(--ink-3,var(--ink-2))}
+.article .tbl{overflow-x:auto}
