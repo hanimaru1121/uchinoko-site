@@ -13,6 +13,9 @@
 - ガイド（ペットの写真で iPhone の壁紙を作る：動く壁紙・ロック画面のコツ）: https://uchinoko.live/guide/pet-wallpaper-iphone/
 - ガイド（ペットの写真を動かしたい：方法の違いと、写真の選び方）: https://uchinoko.live/guide/photo-to-video/
 - ガイド（ペットの写真をスマホでかわいく撮るコツ：光・目線・ピント・動く子の撮り方）: https://uchinoko.live/guide/pet-photo-tips/
+- ガイド（うちの子をドット絵にする方法：自分で描く・写真から変換・描いてもらう）: https://uchinoko.live/guide/pet-pixel-art/
+- ガイド（ペットの似顔絵・イラストをオーダーする前に知っておきたいこと：頼み先・相場・確かめること）: https://uchinoko.live/guide/pet-portrait-order/
+- ガイド（ペットの写真を AI で動画にするアプリ・サービスを比べる：無料枠・長さ・写真の扱い）: https://uchinoko.live/guide/pet-ai-video/
 - Guides: https://uchinoko.live/en/guide/
 - Guide (Desktop Pets for Mac: How to Get Started and Pick the Right One): https://uchinoko.live/en/guide/desktop-pet-mac/
 - Guide (A Cat or Dog Walking on Your Mac Screen: How Desktop Pets Move, and How to Keep Them Out of the Way): https://uchinoko.live/en/guide/desktop-pet-walking/
@@ -21,6 +24,9 @@
 - Guide (Pet Wallpaper for iPhone: Live Photos, Lock Screen Tricks, and Photos That Look Great): https://uchinoko.live/en/guide/pet-wallpaper-iphone/
 - Guide (How to Animate a Photo of Your Pet: Three Approaches, and How to Pick the Right Photos): https://uchinoko.live/en/guide/photo-to-video/
 - Guide (How to Take Better Pet Photos With Your Phone: Light, Eye Level, Focus and Fast Movers): https://uchinoko.live/en/guide/pet-photo-tips/
+- Guide (How to Make Pixel Art of Your Pet: Draw It, Convert a Photo, or Commission It): https://uchinoko.live/en/guide/pet-pixel-art/
+- Guide (Custom Pet Portraits: What to Know Before You Commission One): https://uchinoko.live/en/guide/pet-portrait-order/
+- Guide (AI Pet Video Apps Compared: Turn a Photo of Your Dog or Cat Into a Video): https://uchinoko.live/en/guide/pet-ai-video/
 - 特定商取引法に基づく表記: https://uchinoko.live/tokushoho.html
 - 利用規約: https://uchinoko.live/terms.html
 - Terms: https://uchinoko.live/en/terms.html
