@@ -61,10 +61,11 @@ section{padding-block:clamp(64px,9vw,120px)}
 .btn-light{background:var(--paper);color:var(--ink);box-shadow:none}
 a:focus-visible,.btn:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent-2);outline-offset:3px}
 
-/* ヘッダー */
-.bar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 82%,transparent);backdrop-filter:saturate(1.2) blur(10px);
-  border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
-.bar .wrap{display:flex;align-items:center;gap:18px;height:62px}
+ /* ヘッダー: 上から少し浮いた角丸カプセル */
+.bar{position:sticky;top:0;z-index:10;padding:10px 12px 0;pointer-events:none}
+.bar .wrap{pointer-events:auto;max-width:780px;display:flex;align-items:center;gap:18px;height:52px;padding-inline:14px 8px;border-radius:999px;
+  background:color-mix(in srgb,var(--card) 82%,transparent);backdrop-filter:saturate(1.2) blur(12px);
+  border:1px solid color-mix(in srgb,var(--line) 80%,transparent);box-shadow:0 10px 30px -16px rgba(42,33,27,.35)}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-weight:700;font-size:17px}
 .lang-ja .logo{font-family:var(--font-ja-d)}.lang-en .logo{font-family:var(--font-en);font-size:19px}
 .logo img{border-radius:9px;box-shadow:0 2px 6px rgba(0,0,0,.12)}
@@ -72,27 +73,28 @@ a:focus-visible,.btn:focus-visible,button:focus-visible,summary:focus-visible{ou
 .lang a{color:var(--sub);text-decoration:none}.lang a:hover{color:var(--ink)}
 .lang strong{color:var(--ink);font-weight:600}
 
-/* ヒーロー: 見本の動画を画面いっぱいに並べ、その上に一文とボタン */
-.hero{position:relative;padding:0;min-height:min(calc(100svh - 62px),820px);display:flex;align-items:flex-end;overflow:hidden;background:#1b1613;isolation:isolate}
-.hero-media{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;z-index:-2}
-.strip{margin:0;position:relative;overflow:hidden;background:#2a211b}
-.strip video{width:100%;height:100%;object-fit:cover;transform:scale(1.02)}
-.strip figcaption{position:absolute;top:16px;left:16px;font-size:12.5px;font-weight:700;color:#fffaf2;background:rgba(27,22,19,.42);
-  backdrop-filter:blur(6px);padding:4px 11px;border-radius:999px;letter-spacing:.04em}
-.hero-shade{position:absolute;inset:0;z-index:-1;pointer-events:none;
-  background:linear-gradient(180deg,rgba(27,22,19,0) 30%,rgba(27,22,19,.55) 62%,rgba(27,22,19,.86) 100%),
-             linear-gradient(90deg,rgba(27,22,19,.45),rgba(27,22,19,0) 60%)}
-.hero-copy{width:100%;padding-block:clamp(40px,7vw,84px);color:#fffaf2}
-.hero h1{color:#fffaf2;max-width:16em;text-shadow:0 2px 24px rgba(0,0,0,.35)}
-.hero h1 em{color:#f0b273}
-.lang-ja .hero h1{font-size:clamp(32px,4.6vw,60px)}
-.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:#fffaf2;border:1px solid rgba(255,250,242,.5);
-  border-radius:999px;padding:4px 12px;margin-bottom:18px;letter-spacing:.06em;background:rgba(27,22,19,.25);backdrop-filter:blur(6px)}
-.h1-sub{font-size:clamp(16px,1.6vw,19px);color:rgba(255,250,242,.9);margin:16px 0 0;font-weight:500;max-width:36em}
+/* ヒーロー: 中央に見出しとボタン、その下に見本の動画の舞台。ウィジェットのカードを重ねて「届くもの」を見せる */
+.hero{position:relative;padding:clamp(40px,6vw,76px) 0 clamp(48px,7vw,96px);margin-top:-62px;padding-top:clamp(110px,12vw,150px);overflow:hidden}
+.hero-copy{text-align:center;display:flex;flex-direction:column;align-items:center}
+.hero h1{max-width:15em}
+.lang-ja .hero h1{font-size:clamp(32px,4.6vw,58px)}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:var(--ink-2);border:1px solid var(--line);background:var(--card);
+  border-radius:999px;padding:4px 12px;margin-bottom:18px;letter-spacing:.06em}
+.h1-sub{font-size:clamp(16px,1.6vw,19px);color:var(--ink-2);margin:16px auto 0;font-weight:500;max-width:34em}
 .lang-en .h1-sub{font-family:var(--font-en);font-style:italic;font-weight:400}
 .hero-cta{margin:28px 0 14px}
-.hero .btn{background:#ec7a4f;color:#1b1613;box-shadow:0 14px 30px -12px rgba(236,122,79,.8)}
-.hero-note{font-size:13px;color:rgba(255,250,242,.72);margin:0;max-width:40em}
+.hero-note{font-size:13px;color:var(--sub);margin:0 auto;max-width:40em}
+.hero-stage{position:relative;margin-top:clamp(34px,5vw,60px);margin-bottom:clamp(40px,6vw,80px)}
+.hero-media{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.6vw,20px)}
+.strip{margin:0;position:relative;overflow:hidden;background:var(--paper-2);border-radius:var(--radius);box-shadow:var(--shadow);aspect-ratio:4/5}
+.strip:nth-child(2n){transform:translateY(clamp(14px,3vw,38px))}
+.strip video{width:100%;height:100%;object-fit:cover}
+.strip figcaption{position:absolute;top:14px;left:14px;font-size:12.5px;font-weight:700;color:#fffaf2;background:rgba(27,22,19,.42);
+  backdrop-filter:blur(6px);padding:4px 11px;border-radius:999px;letter-spacing:.04em}
+.hero-widget{position:absolute;left:50%;bottom:clamp(-90px,-6vw,-40px);width:clamp(190px,24vw,300px);height:auto;transform:translateX(-50%) rotate(-2.5deg);
+  border-radius:20px;border:5px solid #1b1613;box-shadow:0 26px 50px -20px rgba(27,22,19,.6);background:#1b1613}
+.lang-en .hero-widget{display:none}
+.hero .btn{box-shadow:0 14px 30px -12px var(--accent)}
 
 /* 見比べ */
 .compare-sec{background:var(--paper-2);border-block:1px solid var(--line)}
@@ -172,27 +174,27 @@ a:focus-visible,.btn:focus-visible,button:focus-visible,summary:focus-visible{ou
 .lang-ja .steps b{font-family:var(--font-ja-d)}
 .steps p{color:var(--ink-2);font-size:15px;margin:0}
 
-/* 値段 */
-.price-sec{background:var(--ink);color:var(--paper)}
+/* 値段: 明るい1枚のカード。長い条件は畳む */
+.price-sec{background:var(--paper-2);border-block:1px solid var(--line)}
 .price-sec .wrap{align-items:start}
-.price-sec h3,.price-sec .price-big{color:var(--paper)}
-.price-sec p,.price-sec li{color:color-mix(in srgb,var(--paper) 82%,transparent)}
-.price-sec a{color:var(--accent-2)}
-.price-sec .kicker{color:var(--accent-2)}
-.price-big{font-size:clamp(54px,8vw,96px);line-height:1;margin:6px 0 18px}
-.price-sec .ticks li::before{box-shadow:inset 0 0 0 2px var(--accent-2);background:transparent}
-.price-sec .ticks li::after{border-color:var(--accent-2)}
-.terms-note{font-size:13.5px;line-height:1.7;opacity:.85;border-left:2px solid var(--accent-2);padding-left:12px}
+.price-card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(26px,4vw,44px);box-shadow:var(--shadow)}
+.price-big{font-size:clamp(54px,8vw,96px);line-height:1;margin:6px 0 18px;color:var(--ink)}
+.price-cta{margin:22px 0 6px}
+.price-more{margin-top:14px;border-top:1px solid var(--line);padding-top:6px}
+.price-more summary{cursor:pointer;font-weight:700;padding:12px 0;color:var(--ink-2);list-style:none}
+.price-more summary::-webkit-details-marker{display:none}
+.price-more summary::after{content:" +";color:var(--accent)}
+.price-more[open] summary::after{content:" −"}
+.terms-note{font-size:13.5px;line-height:1.7;color:var(--ink-2);border-left:2px solid var(--accent-2);padding-left:12px}
 .cookie-open{font:inherit;font-size:13.5px;background:none;border:0;padding:0;color:var(--ink-2);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .promises{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:p}
-.promises li{background:color-mix(in srgb,var(--paper) 7%,transparent);border:1px solid color-mix(in srgb,var(--paper) 16%,transparent);
+.promises li{background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);padding:20px 22px 18px 64px;position:relative;counter-increment:p}
 .promises li::before{content:counter(p);position:absolute;left:20px;top:20px;width:30px;height:30px;border-radius:50%;background:var(--accent);
   color:var(--on-accent);display:grid;place-items:center;font-weight:700;font-size:14px}
-.promises b{display:block;color:var(--paper);font-size:17px;margin-bottom:4px}
+.promises b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
 .lang-ja .promises b{font-family:var(--font-ja-d)}
-.promises p{margin:0;font-size:15px}
-@media (prefers-color-scheme:dark){.price-sec{background:#110d0b}}
+.promises p{margin:0;font-size:15px;color:var(--ink-2)}
 
 /* FAQ */
 .faq details{border-bottom:1px solid var(--line)}
@@ -202,26 +204,32 @@ a:focus-visible,.btn:focus-visible,button:focus-visible,summary:focus-visible{ou
 .faq summary::after{content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:24px;font-weight:300;color:var(--accent);transition:transform .25s}
 .faq details[open] summary::after{transform:translateY(-50%) rotate(45deg)}
 .faq details p{color:var(--ink-2);padding-bottom:18px;margin:0}
+.maker{max-width:640px}
+.maker p{color:var(--ink-2);line-height:1.95;margin:0 0 1.1em}
+.maker .maker-sign{color:var(--sub);font-size:14.5px;margin-top:1.8em}
 
 /* 相談 */
 .contact-sec{padding-top:0}
-.contact{background:var(--accent);color:var(--on-accent);border-radius:32px;padding:clamp(28px,5vw,56px);box-shadow:0 30px 60px -30px var(--accent);position:relative;overflow:hidden}
-.contact::after{content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:color-mix(in srgb,var(--accent-2) 55%,transparent);z-index:0}
+.contact{text-align:center;background:var(--accent);color:var(--on-accent);border-radius:32px;padding:clamp(28px,5vw,56px);box-shadow:0 30px 60px -30px var(--accent);position:relative;overflow:hidden}
+.contact::after{content:"";position:absolute;right:-70px;bottom:-70px;width:140px;height:140px;border-radius:50%;background:color-mix(in srgb,var(--accent-2) 55%,transparent);z-index:0}
 .contact > *{position:relative;z-index:1}
 .contact h2{color:var(--on-accent)}
 .contact p,.contact li{color:color-mix(in srgb,var(--on-accent) 90%,transparent)}
-.contact .ticks li::before{box-shadow:inset 0 0 0 2px var(--on-accent);background:transparent}
-.contact .ticks li::after{border-color:var(--on-accent)}
+.chips{list-style:none;margin:18px auto 26px;padding:0;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chips li{margin:0;font-size:13.5px;line-height:1.4;padding:6px 13px;border-radius:999px;background:color-mix(in srgb,var(--on-accent) 16%,transparent)}
 .to{margin:22px 0 2px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.85}
 .mail{font-size:clamp(22px,3vw,30px);font-weight:700;word-break:break-all;margin-bottom:20px}
 .lang-en .mail{font-family:var(--font-en)}
-.contact-btns{display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
+.contact-btns{justify-content:center;display:flex;flex-wrap:wrap;align-items:center;gap:12px 22px}
 .mail-link{color:var(--on-accent);font-weight:700}
 .contact .small{color:color-mix(in srgb,var(--on-accent) 80%,transparent);margin-top:14px}
 
-footer{padding:44px 0 120px;font-size:13.5px;color:var(--sub)}
+footer{position:relative;overflow:hidden;padding:44px 0 120px;font-size:13.5px;color:var(--sub)}
 footer nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:14px}
 footer nav a{color:var(--ink-2)}
+.foot-mark{margin:40px 0 -0.22em;font-family:var(--font-en);font-weight:600;font-size:clamp(48px,13.5vw,190px);line-height:1;letter-spacing:-.03em;white-space:nowrap;
+  text-align:center;color:color-mix(in srgb,var(--ink) 7%,transparent);user-select:none;pointer-events:none}
+.lang-ja .foot-mark{font-family:var(--font-ja-d);font-size:clamp(40px,10.5vw,150px);letter-spacing:0}
 .credits summary{cursor:pointer;color:var(--ink-2);margin-bottom:6px}
 .credits ul{margin:6px 0;padding-left:1.2em}
 
@@ -282,10 +290,12 @@ html.motion .reveal.in{opacity:1;transform:none}
   .compare-sec .sec-head p{font-size:15px}
   .life-sec .center{display:none}
   .btn-sm{display:none}
-  .hero{min-height:calc(100svh - 62px)}
-  .hero-media{bottom:44%;gap:3px}
-  .hero-shade{background:linear-gradient(180deg,rgba(27,22,19,0) 30%,rgba(27,22,19,.85) 52%,#1b1613 58%)}
+  .hero-media{grid-template-columns:repeat(2,1fr)}
+  .strip{aspect-ratio:1}
   .strip figcaption{display:none}
+  .strip:nth-child(2n){transform:translateY(14px)}
+  .hero-widget{left:auto;right:-6px;bottom:-30px;width:46%;transform:rotate(-2.5deg)}
+  .hero-stage{margin-bottom:40px}
   .trio{gap:8px}
   .trio span{font-size:12px}
   .tabs{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;margin-inline:-16px;padding:2px 16px 6px;scrollbar-width:none;scroll-snap-type:x proximity}
